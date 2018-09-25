@@ -5,10 +5,10 @@ import com.googlecode.objectify.annotation.Id
 import javax.validation.constraints.NotNull
 
 @Entity
-class Router {
+class Router (
     @Id
-    @NotNull
     var id: String? = null
+) {
 
     @NotNull
     var location: Coordinate? = null

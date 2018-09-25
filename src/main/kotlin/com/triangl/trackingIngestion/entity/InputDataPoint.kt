@@ -17,7 +17,7 @@ class InputDataPoint {
     var deviceId: String? = null
 
     @NotNull
-    var signalStrength: Float? = null
+    var signalStrength: Int? = null
 
     @NotNull
     var timeOfFlight: Long? = null

@@ -2,24 +2,24 @@ package com.triangl.trackingIngestion.entity
 
 import com.googlecode.objectify.annotation.Entity
 import com.googlecode.objectify.annotation.Id
-import java.time.Instant
-import javax.validation.constraints.NotNull
+import java.util.*
 
 @Entity
-class RouterDataPoint {
+class RouterDataPoint (
+
+    var router: Router? = null,
+
+    var signalStrength: Int? = null,
+
+    var timeOfFlight: Long? = null,
+
+    var timestamp: String? = null
+
+) {
     @Id
-    @NotNull
     var id: String? = null
 
-    @NotNull
-    var router: Router? = null
-
-    @NotNull
-    var signalStrength: Float? = null
-
-    @NotNull
-    var timeOfFlight: Long? = null
-
-    @NotNull
-    var timestamp: Instant? = null
+    init {
+        id = UUID.randomUUID().toString()
+    }
 }

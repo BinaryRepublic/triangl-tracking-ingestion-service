@@ -7,7 +7,8 @@ import java.util.*
 
 @Entity
 class DatapointGroup (
-        startInstant: String
+        startInstant: String,
+        var deviceId: String
 ) {
     @Id
     var id: String = UUID.randomUUID().toString()
