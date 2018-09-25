@@ -11,6 +11,7 @@ var buffer = HashMap<String, ArrayList<DatapointGroup>>().withDefault { arrayLis
 
 @Service("computingService")
 class ComputingService (
+        var ingestionService: IngestionService,
         var datastoreWs: DatastoreWs
 ) {
     fun insertToBuffer(inputDataPoint: InputDataPoint) {
@@ -20,42 +21,29 @@ class ComputingService (
             val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { it.startInstant <= inputDataPoint.timestamp!! && inputDataPoint.timestamp!! <= it.endInstant }
 
             if (datapointGroup != null) {
-                datapointGroup.dataPoints!!.add(inputDataPoint)
+                datapointGroup.dataPoints.add(inputDataPoint)
             } else {
-                val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp!!, inputDataPoint.deviceId!!).apply { dataPoints = arrayListOf(inputDataPoint) }
+                val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp!!, inputDataPoint.deviceId!!).apply { dataPoints.add(inputDataPoint) }
                 buffer[inputDataPoint.deviceId!!]!!.add(newDatapointGroup)
             }
 
         } else {
-            val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp!!, inputDataPoint.deviceId!!).apply { dataPoints = arrayListOf(inputDataPoint) }
+            val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp!!, inputDataPoint.deviceId!!).apply { dataPoints.add(inputDataPoint) }
             buffer[inputDataPoint.deviceId!!] = arrayListOf(newDatapointGroup)
         }
     }
     fun readFromBuffer():MutableMap<String, ArrayList<DatapointGroup>> = buffer
 
     fun startBufferWatcher() {
+        val delayTime = 5000
         launch {
             while (true) {
                 findElementsToCompute()
 
-                println("Waiting 500ms ...")
-                delay(5000)
+                println("Waiting $delayTime ms ...")
+                delay(delayTime)
             }
         }
-    }
-
-    private fun deleteTimeouts() {
-        val now = Instant.now().toString()
-        println("Deleting everything that timedOut before $now ...")
-        for ((key, value) in buffer) {
-            val filteredList = ArrayList(value.filter { it.timeoutInstant > now })
-            if (filteredList.size == 0) {
-                buffer.remove(key)
-            } else {
-                buffer[key] = filteredList
-            }
-        }
-
     }
 
     private fun findElementsToCompute() {
@@ -65,7 +53,7 @@ class ComputingService (
             val valuesToRemove = arrayListOf<DatapointGroup>()
 
             for (item in value) {
-                if (item.timeoutInstant < now && item.dataPoints!!.size >= 3) {
+                if (item.timeoutInstant < now && item.dataPoints.size >= 3) {
                     computeFromRSSI(item)
                     valuesToRemove.add(item)
                 } else if (item.timeoutInstant < now) {
@@ -76,7 +64,6 @@ class ComputingService (
             value.removeAll(valuesToRemove)
             if (value.size == 0) { buffer.remove(key) }
         }
-
     }
 
     private fun computeFromRSSI (datapointGroup: DatapointGroup) {
@@ -85,7 +72,7 @@ class ComputingService (
         val routerDataPointList = ArrayList<RouterDataPoint>()
         val routersToLookUp = ArrayList<String>()
 
-        for (item in datapointGroup.dataPoints!!) {
+        for (item in datapointGroup.dataPoints) {
             val newRouterDataPoint = RouterDataPoint(router = Router(item.routerId), signalStrength = item.signalStrength, timestamp = item.timestamp)
 
             if (newRouterDataPoint.signalStrength!! > strongestRSSI.signalStrength!!) {
@@ -97,13 +84,21 @@ class ComputingService (
         }
 
         val customerObj = datastoreWs.getRoutersById(routersToLookUp)
-
         val routerHashMap = parseRoutersIntoHashmap(customerObj)
 
         addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
         strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
 
-        print(TrackingPoint(routerDataPointList, datapointGroup.deviceId, strongestRSSI.router!!.location!!.x!!, strongestRSSI.router!!.location!!.y!!))
+        val newTrackingPoint = TrackingPoint(routerDataPointList, datapointGroup.deviceId, strongestRSSI.router!!.location!!.x!!, strongestRSSI.router!!.location!!.y!!)
+
+        print("DeviceId: ")
+        println(newTrackingPoint.deviceId)
+        print("X: ")
+        println(newTrackingPoint.location!!.x)
+        print("Y: ")
+        println(newTrackingPoint.location!!.y)
+
+        ingestionService.insertTrackingPoint(newTrackingPoint)
     }
 
     private fun parseRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
@@ -122,10 +117,5 @@ class ComputingService (
         for (routerDataPoint in routerDataPointList) {
             routerDataPoint.router = routerHashMap[routerDataPoint.router!!.id]
         }
-    }
-
-    private fun insertToDB () {
-        println("inserting to DB ...")
-
     }
 }

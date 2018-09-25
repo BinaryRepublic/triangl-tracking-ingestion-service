@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 @Service
-@Profile("development")
+@Profile("production")
 class DatastoreWsImp: DatastoreWs {
     override fun saveTrackingPoint(trackingPoint: TrackingPoint) {
         ofy().save().entity(trackingPoint)

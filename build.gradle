@@ -55,4 +55,5 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-reflect")
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.21"
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('io.rest-assured:rest-assured:3.0.2')
 }
