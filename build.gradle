@@ -22,6 +22,11 @@ apply plugin: 'io.spring.dependency-management'
 group = 'com.triangl'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+kotlin {
+	experimental {
+		coroutines 'enable'
+	}
+}
 compileKotlin {
 	kotlinOptions {
 		freeCompilerArgs = ["-Xjsr305=strict"]
@@ -36,7 +41,8 @@ compileTestKotlin {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+    jcenter()
 }
 
 
@@ -47,5 +53,6 @@ dependencies {
 	compile('com.fasterxml.jackson.module:jackson-module-kotlin')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.21"
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
