@@ -1,20 +1,13 @@
 package com.triangl.trackingIngestion.entity
 
-import javax.validation.constraints.NotNull
+class InputDataPoint (
+    var routerId: String,
 
-class InputDataPoint {
-    @NotNull
-    var routerId: String? = null
+    var deviceId: String,
 
-    @NotNull
-    var deviceId: String? = null
+    var timestamp: String,
 
-    @NotNull
-    var signalStrength: Int? = null
+    var signalStrength: Int? = null,
 
-    @NotNull
     var timeOfFlight: Long? = null
-
-    @NotNull
-    var timestamp: String? = null
-}
+)

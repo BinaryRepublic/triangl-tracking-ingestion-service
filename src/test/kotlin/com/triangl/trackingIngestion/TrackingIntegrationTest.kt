@@ -26,41 +26,34 @@ class CustomerIntegrationTest {
     }
 
     @Test
-    fun `should return a list of customers`() {
+    fun `should accept an InputDataPoint`() {
 
-        val routerIds = listOf("Router1", "Router2", "Router3")
+        val routerId = "Router1"
         val deviceId = "Device1"
-        val signalStrengths = listOf(255, 100, 50)
+        val signalStrength = 255
         val now = Instant.now().toString()
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"${routerIds[0]}\", \"signalStrength\": \"${signalStrengths[0]}\", \"timestamp\": \"$now\" }")
+                .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestamp\": \"$now\" }")
                 .post("/tracking")
                 .then()
                 .log().ifValidationFails()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(HttpStatus.NO_CONTENT.value())
 
-        Thread.sleep(1000)
+    }
+
+    @Test
+    fun `should return 404 because wrong input format`() {
+
+        val routerId = "Router1"
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"${routerIds[1]}\", \"signalStrength\": \"${signalStrengths[1]}\", \"timestamp\": \"$now\" }")
+                .body("{ \"routerId\": \"$routerId\" }")
                 .post("/tracking")
                 .then()
                 .log().ifValidationFails()
-                .statusCode(HttpStatus.OK.value())
-
-        Thread.sleep(1000)
-
-        RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"${routerIds[2]}\", \"signalStrength\": \"${signalStrengths[2]}\", \"timestamp\": \"$now\" }")
-                .post("/tracking")
-                .then()
-                .log().ifValidationFails()
-                .statusCode(HttpStatus.OK.value())
-
-        Thread.sleep(60000)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
     }
 }

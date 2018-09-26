@@ -9,7 +9,7 @@ class IngestionService (
     private val datastoreWs: DatastoreWs
 ) {
     fun insertTrackingPoint(trackingPoint: TrackingPoint): TrackingPoint {
-        datastoreWs.saveTrackingPoint(trackingPoint)
-        return trackingPoint
+        val key = datastoreWs.saveTrackingPoint(trackingPoint)
+        return datastoreWs.getTrackingPointByKey(key)
     }
 }

@@ -6,6 +6,8 @@ import java.util.*
 
 @Entity
 class RouterDataPoint (
+    @Id
+    var id: String? = null,
 
     var router: Router? = null,
 
@@ -14,11 +16,7 @@ class RouterDataPoint (
     var timeOfFlight: Long? = null,
 
     var timestamp: String? = null
-
 ) {
-    @Id
-    var id: String? = null
-
     init {
         id = UUID.randomUUID().toString()
     }

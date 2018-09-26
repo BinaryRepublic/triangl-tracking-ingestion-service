@@ -17,11 +17,11 @@ class TrackingIngestionController (
     }
 
     @PostMapping("/tracking")
-    fun computeAndIngest(@RequestBody inputDataPoint: InputDataPoint): ResponseEntity<*> {
+    fun insertToBuffer(@RequestBody inputDataPoint: InputDataPoint): ResponseEntity<Void> {
 
         computingService.insertToBuffer(inputDataPoint)
 
-        return ResponseEntity.ok().body(hashMapOf("received" to true))
+        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/read")

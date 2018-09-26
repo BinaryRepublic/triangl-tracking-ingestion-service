@@ -6,23 +6,15 @@ import java.util.*
 import javax.validation.constraints.NotNull
 
 @Entity
-class Coordinate {
+class Coordinate (
     @Id
-    @NotNull
-    var id: String? = null
+    var id: String? = null,
 
-    @NotNull
-    var x: Float? = null
+    var x: Float? = null,
 
-    @NotNull
     var y: Float? = null
-
-    @Suppress("unused")
-    constructor()
-
-    constructor(x: Float, y: Float) {
+) {
+    init {
         this.id = UUID.randomUUID().toString()
-        this.x = x
-        this.y = y
     }
 }

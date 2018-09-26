@@ -7,38 +7,25 @@ import java.util.*
 import javax.validation.constraints.NotNull
 
 @Entity
-class TrackingPoint {
+class TrackingPoint (
     @Id
-    @NotNull
-    var id: String? = null
+    var id: String? = null,
 
-    @NotNull
-    var routerDataPoints: List<RouterDataPoint>? = null
+    var routerDataPoints: List<RouterDataPoint>? = null,
 
-    @NotNull
-    var deviceId: String? = null
+    var deviceId: String? = null,
 
-    @NotNull
-    var location: Coordinate? = null
+    var location: Coordinate? = null,
 
-    @NotNull
-    var deleted: Boolean? = null
+    var deleted: Boolean? = null,
 
-    @NotNull
-    var lastUpdatedAt: String? = null
+    var lastUpdatedAt: String? = null,
 
-    @NotNull
     var createdAt: String? = null
-
-    @Suppress("unused")
-    constructor()
-
-    constructor(routerDataPoints: List<RouterDataPoint>, deviceId: String, x: Float, y: Float) {
+) {
+    init {
         this.id = UUID.randomUUID().toString()
-        this.routerDataPoints = routerDataPoints
-        this.deviceId = deviceId
-        this.location = Coordinate(x,y)
-        this.deleted = false
+        this.routerDataPoints = ArrayList()
         this.lastUpdatedAt = Instant.now().toString()
         this.createdAt = Instant.now().toString()
     }

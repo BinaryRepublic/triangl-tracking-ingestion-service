@@ -10,32 +10,23 @@ import kotlin.collections.ArrayList
 
 @javax.persistence.Entity
 @Entity
-class Customer {
+class Customer (
     @Id
-    var id: String? = null
+    var id: String? = null,
 
-    @NotNull
-    var name: String? = null
+    var name: String? = null,
 
     @Index
-    @NotNull
-    var maps: List<Map>? = null
+    var maps: List<Map>? = null,
 
-    @NotNull
-    var deleted: Boolean? = null
+    var deleted: Boolean? = null,
 
-    @NotNull
-    var lastUpdatedAt: String? = null
+    var lastUpdatedAt: String? = null,
 
-    @NotNull
     var createdAt: String? = null
-
-    @Suppress("unused")
-    constructor()
-
-    constructor(name: String) {
+) {
+    init {
         this.id = UUID.randomUUID().toString()
-        this.name = name
         this.maps = ArrayList()
         this.deleted = false
         this.createdAt = Instant.now().toString()

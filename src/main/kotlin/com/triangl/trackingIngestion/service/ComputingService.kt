@@ -18,18 +18,18 @@ class ComputingService (
         println("--- Inserting to Buffer ---")
         if (buffer.containsKey(inputDataPoint.deviceId)) {
 
-            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { it.startInstant <= inputDataPoint.timestamp!! && inputDataPoint.timestamp!! <= it.endInstant }
+            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { it.startInstant <= inputDataPoint.timestamp && inputDataPoint.timestamp <= it.endInstant }
 
             if (datapointGroup != null) {
                 datapointGroup.dataPoints.add(inputDataPoint)
             } else {
-                val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp!!, inputDataPoint.deviceId!!).apply { dataPoints.add(inputDataPoint) }
-                buffer[inputDataPoint.deviceId!!]!!.add(newDatapointGroup)
+                val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp, inputDataPoint.deviceId).apply { dataPoints.add(inputDataPoint) }
+                buffer[inputDataPoint.deviceId]!!.add(newDatapointGroup)
             }
 
         } else {
-            val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp!!, inputDataPoint.deviceId!!).apply { dataPoints.add(inputDataPoint) }
-            buffer[inputDataPoint.deviceId!!] = arrayListOf(newDatapointGroup)
+            val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp, inputDataPoint.deviceId).apply { dataPoints.add(inputDataPoint) }
+            buffer[inputDataPoint.deviceId] = arrayListOf(newDatapointGroup)
         }
     }
     fun readFromBuffer():MutableMap<String, ArrayList<DatapointGroup>> = buffer
@@ -80,7 +80,7 @@ class ComputingService (
             }
 
             routerDataPointList.add(newRouterDataPoint)
-            routersToLookUp.add(item.routerId!!)
+            routersToLookUp.add(item.routerId)
         }
 
         val customerObj = datastoreWs.getRoutersById(routersToLookUp)
@@ -89,7 +89,8 @@ class ComputingService (
         addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
         strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
 
-        val newTrackingPoint = TrackingPoint(routerDataPointList, datapointGroup.deviceId, strongestRSSI.router!!.location!!.x!!, strongestRSSI.router!!.location!!.y!!)
+        val coordinate = Coordinate(x = strongestRSSI.router!!.location!!.x, y = strongestRSSI.router!!.location!!.y)
+        val newTrackingPoint = TrackingPoint(deviceId = datapointGroup.deviceId, location = coordinate, routerDataPoints = routerDataPointList)
 
         print("DeviceId: ")
         println(newTrackingPoint.deviceId)
