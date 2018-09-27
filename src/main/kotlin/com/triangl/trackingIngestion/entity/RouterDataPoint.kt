@@ -1,12 +1,11 @@
 package com.triangl.trackingIngestion.entity
 
-import com.googlecode.objectify.annotation.Entity
 import com.googlecode.objectify.annotation.Id
 import java.util.*
+import javax.persistence.Entity
 
 @Entity
 class RouterDataPoint (
-    @Id
     var id: String? = null,
 
     var router: Router? = null,

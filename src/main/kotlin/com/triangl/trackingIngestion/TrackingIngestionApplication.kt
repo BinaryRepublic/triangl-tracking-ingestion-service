@@ -19,12 +19,8 @@ class TrackingIngestionApplication
 fun main(args: Array<String>) {
 
     ObjectifyService.init()
-    ObjectifyService.register(Map::class.java)
-    ObjectifyService.register(Router::class.java)
     ObjectifyService.register(Customer::class.java)
-    ObjectifyService.register(Coordinate::class.java)
     ObjectifyService.register(TrackingPoint::class.java)
-    ObjectifyService.register(RouterDataPoint::class.java)
 
     runApplication<TrackingIngestionApplication>(*args)
 }
