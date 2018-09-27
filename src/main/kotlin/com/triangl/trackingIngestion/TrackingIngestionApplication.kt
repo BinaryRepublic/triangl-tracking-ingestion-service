@@ -2,8 +2,8 @@ package com.triangl.trackingIngestion
 
 import com.googlecode.objectify.ObjectifyFilter
 import com.googlecode.objectify.ObjectifyService
-import com.triangl.trackingIngestion.entity.*
-import com.triangl.trackingIngestion.entity.Map
+import com.triangl.trackingIngestion.entity.Customer
+import com.triangl.trackingIngestion.entity.TrackingPoint
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Profile

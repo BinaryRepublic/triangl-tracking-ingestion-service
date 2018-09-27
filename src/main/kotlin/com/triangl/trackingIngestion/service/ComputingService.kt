@@ -1,5 +1,6 @@
 package com.triangl.trackingIngestion.service
 
+import com.googlecode.objectify.ObjectifyService
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import kotlinx.coroutines.experimental.delay
@@ -54,7 +55,7 @@ class ComputingService (
 
             for (item in value) {
                 if (item.timeoutInstant < now && item.dataPoints.size >= 3) {
-                    computeFromRSSI(item)
+                    ObjectifyService.run { computeFromRSSI(item) }
                     valuesToRemove.add(item)
                 } else if (item.timeoutInstant < now) {
                     valuesToRemove.add(item)
@@ -91,13 +92,6 @@ class ComputingService (
 
         val coordinate = Coordinate(x = strongestRSSI.router!!.location!!.x, y = strongestRSSI.router!!.location!!.y)
         val newTrackingPoint = TrackingPoint(deviceId = datapointGroup.deviceId, location = coordinate, routerDataPoints = routerDataPointList)
-
-        print("DeviceId: ")
-        println(newTrackingPoint.deviceId)
-        print("X: ")
-        println(newTrackingPoint.location!!.x)
-        print("Y: ")
-        println(newTrackingPoint.location!!.y)
 
         ingestionService.insertTrackingPoint(newTrackingPoint)
     }

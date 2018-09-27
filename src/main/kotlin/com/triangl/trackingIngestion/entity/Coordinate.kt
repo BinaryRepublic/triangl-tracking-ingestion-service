@@ -2,7 +2,6 @@ package com.triangl.trackingIngestion.entity
 
 import java.util.*
 import javax.persistence.Entity
-import javax.validation.constraints.NotNull
 
 @Entity
 class Coordinate (

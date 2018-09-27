@@ -19,6 +19,6 @@ class DatastoreWsImp: DatastoreWs {
     }
 
     override fun getRoutersById(IDList: List<String>): Customer {
-        return ofy().load().type(Customer::class.java).filter("maps.router.id in", IDList).first().now()
+        return ofy().load().type(Customer::class.java).filter("maps.router.id =", IDList[0]).first().now()
     }
 }

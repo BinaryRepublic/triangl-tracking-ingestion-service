@@ -1,7 +1,5 @@
 package com.triangl.trackingIngestion.entity
 
-import com.googlecode.objectify.annotation.Id
-import com.googlecode.objectify.annotation.Index
 import java.util.*
 import javax.persistence.Entity
 import kotlin.collections.ArrayList

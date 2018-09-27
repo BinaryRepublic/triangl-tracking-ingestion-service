@@ -1,6 +1,5 @@
 package com.triangl.trackingIngestion.entity
 
-import com.googlecode.objectify.annotation.Id
 import java.util.*
 import javax.persistence.Entity
 

@@ -4,7 +4,6 @@ import com.googlecode.objectify.annotation.Entity
 import com.googlecode.objectify.annotation.Id
 import java.time.Instant
 import java.util.*
-import javax.validation.constraints.NotNull
 
 @Entity
 class TrackingPoint (
@@ -25,8 +24,8 @@ class TrackingPoint (
 ) {
     init {
         this.id = UUID.randomUUID().toString()
-        this.routerDataPoints = ArrayList()
         this.lastUpdatedAt = Instant.now().toString()
         this.createdAt = Instant.now().toString()
+        this.deleted = false
     }
 }
