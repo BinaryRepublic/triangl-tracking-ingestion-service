@@ -24,6 +24,16 @@ class TrackingIngestionController (
         return ResponseEntity.noContent().build()
     }
 
+    @PostMapping("/tracking/multiple")
+    fun insertManyToBuffer(@RequestBody inputDataPoints: List<InputDataPoint>): ResponseEntity<Void> {
+
+        for (inputDataPoint in inputDataPoints) {
+            computingService.insertToBuffer(inputDataPoint)
+        }
+
+        return ResponseEntity.noContent().build()
+    }
+
     @GetMapping("/read")
     fun testRead(): ResponseEntity<*>{
         val buffer = computingService.readFromBuffer()

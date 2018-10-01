@@ -44,6 +44,25 @@ class CustomerIntegrationTest {
     }
 
     @Test
+    fun `should accept a list of InputDataPoints`() {
+
+        val routerId = "Router1"
+        val deviceId = "Device1"
+        val signalStrength = 255
+        val now = Instant.now().toString()
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body("[{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestamp\": \"$now\" }," +
+                            " { \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestamp\": \"$now\" }]")
+                .post("/tracking/multiple")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+
+    }
+
+    @Test
     fun `should return 404 because wrong input format`() {
 
         val routerId = "Router1"

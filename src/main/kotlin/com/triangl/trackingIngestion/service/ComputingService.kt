@@ -19,7 +19,7 @@ class ComputingService (
         println("--- Inserting to Buffer ---")
         if (buffer.containsKey(inputDataPoint.deviceId)) {
 
-            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { it.startInstant <= inputDataPoint.timestamp && inputDataPoint.timestamp <= it.endInstant }
+            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { inputDataPoint.timestamp >= it.startInstant && inputDataPoint.timestamp <= it.endInstant }
 
             if (datapointGroup != null) {
                 datapointGroup.dataPoints.add(inputDataPoint)
@@ -33,6 +33,7 @@ class ComputingService (
             buffer[inputDataPoint.deviceId] = arrayListOf(newDatapointGroup)
         }
     }
+
     fun readFromBuffer():MutableMap<String, ArrayList<DatapointGroup>> = buffer
 
     fun startBufferWatcher() {
