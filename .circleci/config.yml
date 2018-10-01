@@ -1,0 +1,90 @@
+defaults:
+  working_directory: ~/repo
+
+version: 2
+jobs:
+  build:
+
+    docker:
+    - image: circleci/openjdk:10-jdk
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+
+    steps:
+    - checkout
+    # Download and cache dependencies
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "build.gradle" }}
+        # fallback to using the latest cache if no exact match is found
+        - v1-dependencies-
+    - run: gradle dependencies
+    - save_cache:
+        paths:
+        - ~/.gradle
+        key: v1-dependencies-{{ checksum "build.gradle" }}
+    - run: gradle build
+    - run: gradle test
+    - persist_to_workspace:
+        root: .
+        paths:
+        - build/libs
+
+  push_to_gcr:
+
+    docker:
+    - image: turbinelabs/gcloud-build:0.12.4
+
+    steps:
+    - run: openrc boot
+    - attach_workspace:
+        at: .
+    - setup_remote_docker
+    - run:
+        name: create dockerfile
+        command: |
+          echo 'FROM openjdk:10-jre-slim
+                WORKDIR /home
+                COPY build/libs .
+                CMD ["java", "-jar", "trackingIngestion.jar"]' > Dockerfile
+    - run:
+        name: build from dockerfile
+        command: |
+          docker build -t eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion .
+          docker tag eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion:$CIRCLE_SHA1
+    - run:
+        name: push to gcr
+        command: |
+          gcloud docker -- push eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion:$CIRCLE_SHA1
+  deploy_to_k8s:
+
+    docker:
+    - image: turbinelabs/gcloud-build:0.12.4
+
+    steps:
+    - run: openrc boot
+    - deploy:
+        name: deploy to kubernetes
+        command: |
+          kubectl set image deployment/tracking-ingestion tracking-ingestion=eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion:$CIRCLE_SHA1
+          kubectl rollout status deployment/tracking-ingestion
+workflows:
+  version: 2
+  build_and_push_to_gcr:
+    jobs:
+    - build
+    - push_to_gcr:
+        requires:
+        - build
+        filters:
+          branches:
+            only: master
+    - deploy_to_k8s:
+        requires:
+        - push_to_gcr
+        filters:
+          branches:
+            only: master

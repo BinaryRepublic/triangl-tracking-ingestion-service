@@ -12,8 +12,8 @@ var buffer = HashMap<String, ArrayList<DatapointGroup>>().withDefault { arrayLis
 
 @Service("computingService")
 class ComputingService (
-        var ingestionService: IngestionService,
-        var datastoreWs: DatastoreWs
+    var ingestionService: IngestionService,
+    var datastoreWs: DatastoreWs
 ) {
     fun insertToBuffer(inputDataPoint: InputDataPoint) {
         println("--- Inserting to Buffer ---")
