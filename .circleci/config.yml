@@ -49,16 +49,16 @@ jobs:
           echo 'FROM openjdk:10-jre-slim
                 WORKDIR /home
                 COPY build/libs .
-                CMD ["java", "-jar", "trackingIngestion.jar"]' > Dockerfile
+                CMD ["java", "-jar", "tracking-ingestion-service.jar"]' > Dockerfile
     - run:
         name: build from dockerfile
         command: |
-          docker build -t eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion .
-          docker tag eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion:$CIRCLE_SHA1
+          docker build -t eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service .
+          docker tag eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service:$CIRCLE_SHA1
     - run:
         name: push to gcr
         command: |
-          gcloud docker -- push eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion:$CIRCLE_SHA1
+          gcloud docker -- push eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service:$CIRCLE_SHA1
   deploy_to_k8s:
 
     docker:
@@ -69,8 +69,8 @@ jobs:
     - deploy:
         name: deploy to kubernetes
         command: |
-          kubectl set image deployment/tracking-ingestion tracking-ingestion=eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion:$CIRCLE_SHA1
-          kubectl rollout status deployment/tracking-ingestion
+          kubectl set image deployment/tracking-ingestion tracking-ingestion=eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service:$CIRCLE_SHA1
+          kubectl rollout status deployment/tracking-ingestion-service
 workflows:
   version: 2
   build_and_push_to_gcr:
