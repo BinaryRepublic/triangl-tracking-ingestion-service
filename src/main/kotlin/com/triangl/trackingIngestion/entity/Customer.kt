@@ -26,7 +26,6 @@ class Customer (
 ) {
     init {
         this.id = UUID.randomUUID().toString()
-        this.maps = ArrayList()
         this.deleted = false
         this.createdAt = Instant.now().toString()
         this.lastUpdatedAt = Instant.now().toString()

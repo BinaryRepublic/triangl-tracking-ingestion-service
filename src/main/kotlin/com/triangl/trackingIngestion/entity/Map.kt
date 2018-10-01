@@ -18,6 +18,5 @@ class Map (
 ) {
     init {
         this.id = UUID.randomUUID().toString()
-        this.router = ArrayList()
     }
 }

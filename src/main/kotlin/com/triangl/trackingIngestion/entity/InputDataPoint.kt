@@ -7,7 +7,7 @@ class InputDataPoint (
 
     var timestamp: String,
 
-    var signalStrength: Int? = null,
+    var signalStrength: Int,
 
     var timeOfFlight: Long? = null
 )

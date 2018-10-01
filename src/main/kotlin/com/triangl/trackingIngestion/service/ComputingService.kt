@@ -47,7 +47,7 @@ class ComputingService (
         }
     }
 
-    private fun findElementsToCompute() {
+    protected fun findElementsToCompute() {
         val now = Instant.now().toString()
         println("Finding elements to compute ($now) ...")
         for ((key, value) in buffer) {
@@ -67,7 +67,7 @@ class ComputingService (
         }
     }
 
-    private fun computeFromRSSI (datapointGroup: DatapointGroup) {
+    protected fun computeFromRSSI (datapointGroup: DatapointGroup) {
         println("Computing ...")
         var strongestRSSI = RouterDataPoint().apply { signalStrength = 0 }
         val routerDataPointList = ArrayList<RouterDataPoint>()
@@ -96,7 +96,7 @@ class ComputingService (
         ingestionService.insertTrackingPoint(newTrackingPoint)
     }
 
-    private fun parseRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
+    protected fun parseRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
         val hashMap = HashMap<String, Router>()
 
         for (map in customer.maps!!) {
@@ -108,7 +108,7 @@ class ComputingService (
         return hashMap
     }
 
-    private fun addRouterToRouterDataPoints(routerDataPointList: List<RouterDataPoint>, routerHashMap: HashMap<String, Router>) {
+    protected fun addRouterToRouterDataPoints(routerDataPointList: List<RouterDataPoint>, routerHashMap: HashMap<String, Router>) {
         for (routerDataPoint in routerDataPointList) {
             routerDataPoint.router = routerHashMap[routerDataPoint.router!!.id]
         }
