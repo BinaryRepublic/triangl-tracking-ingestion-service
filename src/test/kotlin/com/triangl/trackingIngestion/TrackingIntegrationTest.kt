@@ -59,7 +59,7 @@ class CustomerIntegrationTest {
                 .then()
                 .log().ifValidationFails()
                 .statusCode(HttpStatus.NO_CONTENT.value())
-
+        Thread.sleep(40000)
     }
 
     @Test
