@@ -35,7 +35,7 @@ class ComputingServiceTest {
     @InjectMocks
     private lateinit var computingService: ComputingServiceWrapper
 
-    private val now = Instant.now().minusSeconds(30).toString()
+    private val now = "2018-09-25T13:49:09.404141Z"
     private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", now, 255)
     private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", now, 200)
     private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", now, 180)
