@@ -8,13 +8,10 @@ import com.triangl.trackingIngestion.service.IngestionService
 import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.array
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.Instant
 
@@ -23,7 +20,7 @@ class ComputingServiceWrapper(
     datastoreWs: DatastoreWs
 ): ComputingService(ingestionService, datastoreWs) {
     fun computeFromRSSIPublic(datapointGroup: DatapointGroup) = computeFromRSSI(datapointGroup)
-    fun parseRoutersIntoHashmapPublic(customer: Customer): HashMap<String, Router> = parseRoutersIntoHashmap(customer)
+    fun parseCustomerRoutersIntoHashmapPublic(customer: Customer): HashMap<String, Router> = parseCustomerRoutersIntoHashmap(customer)
     fun addRouterToRouterDataPointsPublic(routerDataPointList: List<RouterDataPoint>, routerHashMap: HashMap<String, Router>) = addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
 }
 
@@ -107,7 +104,7 @@ class ComputingServiceTest {
     @Test
     fun `should parse Routers into Hashmap`() {
         /* When */
-        val hashMapResult = computingService.parseRoutersIntoHashmapPublic(customer)
+        val hashMapResult = computingService.parseCustomerRoutersIntoHashmapPublic(customer)
 
         /* Then */
         assertThat(hashMapResult[router1.id], `is`(router1))

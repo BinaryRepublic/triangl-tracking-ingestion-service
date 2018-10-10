@@ -15,8 +15,4 @@ class Map (
     var size: Coordinate? = null,
 
     var router: ArrayList<Router>? = null
-) {
-    init {
-        this.id = UUID.randomUUID().toString()
-    }
-}
+)

@@ -27,8 +27,8 @@ class TrackingIngestionController (
     @PostMapping("/tracking/multiple")
     fun insertManyToBuffer(@RequestBody inputDataPoints: List<InputDataPoint>): ResponseEntity<Void> {
 
-        for (inputDataPoint in inputDataPoints) {
-            computingService.insertToBuffer(inputDataPoint)
+        inputDataPoints.forEach {
+            computingService.insertToBuffer(it)
         }
 
         return ResponseEntity.noContent().build()

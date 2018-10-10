@@ -8,7 +8,7 @@ import kotlinx.coroutines.experimental.launch
 import org.springframework.stereotype.Service
 import java.time.Instant
 
-var buffer = HashMap<String, ArrayList<DatapointGroup>>().withDefault { arrayListOf() }
+var buffer = HashMap<String, ArrayList<DatapointGroup>>()
 
 @Service("computingService")
 class ComputingService (
@@ -64,7 +64,10 @@ class ComputingService (
             }
 
             value.removeAll(valuesToRemove)
-            if (value.size == 0) { buffer.remove(key) }
+
+            if (value.size == 0) {
+                buffer.remove(key)
+            }
         }
     }
 
@@ -74,30 +77,34 @@ class ComputingService (
         val routerDataPointList = ArrayList<RouterDataPoint>()
         val routersToLookUp = ArrayList<String>()
 
-        for (item in datapointGroup.dataPoints) {
-            val newRouterDataPoint = RouterDataPoint(router = Router(item.routerId), signalStrength = item.signalStrength, timestamp = item.timestamp)
+        for (dataPoint in datapointGroup.dataPoints) {
+            val newRouterDataPoint = RouterDataPoint(router = Router(dataPoint.routerId), signalStrength = dataPoint.signalStrength, timestamp = dataPoint.timestamp)
 
             if (newRouterDataPoint.signalStrength!! > strongestRSSI.signalStrength!!) {
                 strongestRSSI = newRouterDataPoint
             }
 
             routerDataPointList.add(newRouterDataPoint)
-            routersToLookUp.add(item.routerId)
+            routersToLookUp.add(dataPoint.routerId)
         }
 
         val customerObj = datastoreWs.getRoutersById(routersToLookUp)
-        val routerHashMap = parseRoutersIntoHashmap(customerObj)
+        val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj)
 
         addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
         strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
 
-        val coordinate = Coordinate(x = strongestRSSI.router!!.location!!.x, y = strongestRSSI.router!!.location!!.y)
-        val newTrackingPoint = TrackingPoint(deviceId = datapointGroup.deviceId, location = coordinate, routerDataPoints = routerDataPointList)
+        val coordinate = Coordinate(x = strongestRSSI.router!!.location!!.x,
+                                    y = strongestRSSI.router!!.location!!.y)
+
+        val newTrackingPoint = TrackingPoint(deviceId = datapointGroup.deviceId,
+                                             location = coordinate,
+                                             routerDataPoints = routerDataPointList)
 
         ingestionService.insertTrackingPoint(newTrackingPoint)
     }
 
-    protected fun parseRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
+    protected fun parseCustomerRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
         val hashMap = HashMap<String, Router>()
 
         for (map in customer.maps!!) {
