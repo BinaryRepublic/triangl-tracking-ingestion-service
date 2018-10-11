@@ -13,10 +13,10 @@ class IngestionService (
     private val datastoreWs: DatastoreWs,
     private val messagingGateway: PubsubOutboundGateway
 ) {
-    fun insertTrackingPoint(trackingPoint: TrackingPoint): TrackingPoint {
+    fun insertTrackingPoint(trackingPoint: TrackingPoint, mapId: String): TrackingPoint {
         val key = datastoreWs.saveTrackingPoint(trackingPoint)
 
-        val pubSubEvent = PubSubEvent(trackingPoint, "APPLY_TRACKING_POINT", hashMapOf("mapId" to "TestMap"))
+        val pubSubEvent = PubSubEvent(trackingPoint, "APPLY_TRACKING_POINT", hashMapOf("mapId" to mapId))
         val pubSubMessage = PubSubMessage(listOf(pubSubEvent))
 
         val jsonString = jacksonObjectMapper().writeValueAsString(pubSubMessage)

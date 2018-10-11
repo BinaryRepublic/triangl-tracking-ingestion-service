@@ -101,7 +101,7 @@ class ComputingService (
                                              location = coordinate,
                                              routerDataPoints = routerDataPointList)
 
-        ingestionService.insertTrackingPoint(newTrackingPoint)
+        ingestionService.insertTrackingPoint(newTrackingPoint, customerObj.maps!![0].id!!)
     }
 
     protected fun parseCustomerRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
