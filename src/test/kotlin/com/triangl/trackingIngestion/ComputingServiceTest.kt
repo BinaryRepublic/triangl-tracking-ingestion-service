@@ -55,7 +55,6 @@ class ComputingServiceTest {
 
         /* Then */
         val bufferState = computingService.readFromBuffer()
-        assertThat(bufferState.keys.size, `is`(1))
         assertThat(bufferState["DeviceId1"]!!.size, `is`(1))
         assertThat(bufferState["DeviceId1"]!![0].dataPoints.size, `is`(1))
 
@@ -71,7 +70,6 @@ class ComputingServiceTest {
 
         /* Then */
         val bufferState = computingService.readFromBuffer()
-        assertThat(bufferState.keys.size, `is`(1))
         assertThat(bufferState["DeviceId1"]!!.size, `is`(1))
         assertThat(bufferState["DeviceId1"]!![0].dataPoints.size, `is`(3))
 
