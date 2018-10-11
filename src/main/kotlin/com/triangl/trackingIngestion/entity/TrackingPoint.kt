@@ -18,10 +18,13 @@ class TrackingPoint (
 
     var deleted: Boolean? = null,
 
+    var lastUpdatedAt: String? = null,
+
     var createdAt: String? = null
 ) {
     init {
         this.id = UUID.randomUUID().toString()
+        this.lastUpdatedAt = Instant.now().toString()
         this.createdAt = Instant.now().toString()
         this.deleted = false
     }
