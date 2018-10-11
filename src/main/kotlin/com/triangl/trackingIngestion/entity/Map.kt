@@ -1,8 +1,6 @@
 package com.triangl.trackingIngestion.entity
 
-import java.util.*
 import javax.persistence.Entity
-import kotlin.collections.ArrayList
 
 @Entity
 class Map (

@@ -1,6 +1,8 @@
 package com.triangl.trackingIngestion
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.check
+import com.nhaarman.mockito_kotlin.given
+import com.nhaarman.mockito_kotlin.verify
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.entity.Map
 import com.triangl.trackingIngestion.service.ComputingService

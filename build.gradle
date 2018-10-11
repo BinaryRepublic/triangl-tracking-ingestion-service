@@ -44,6 +44,9 @@ compileTestKotlin {
 
 repositories {
     mavenCentral()
+    maven {
+        url "http://repo.spring.io/libs-milestone"
+    }
     jcenter()
 }
 
@@ -55,7 +58,9 @@ dependencies {
     compile('com.fasterxml.jackson.module:jackson-module-kotlin') 
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8") 
     compile("org.jetbrains.kotlin:kotlin-reflect") 
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.21"
+    compile ("org.jetbrains.kotlinx:kotlinx-coroutines-core:0.21") 
+    compile("org.springframework.cloud:spring-cloud-gcp-starter-pubsub:1.0.0.M3")
+    compile("org.springframework.integration:spring-integration-core")
 	
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('io.rest-assured:rest-assured:3.0.2')
