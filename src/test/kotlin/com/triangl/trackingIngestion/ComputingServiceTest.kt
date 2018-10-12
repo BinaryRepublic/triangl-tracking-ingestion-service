@@ -1,6 +1,8 @@
 package com.triangl.trackingIngestion
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.check
+import com.nhaarman.mockito_kotlin.given
+import com.nhaarman.mockito_kotlin.verify
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.entity.Map
 import com.triangl.trackingIngestion.service.ComputingService
@@ -45,7 +47,7 @@ class ComputingServiceTest {
     private val router3 = Router("RouterId3", Coordinate(x = 3f, y = 4f))
     private val routerList = arrayListOf(router1, router2, router3)
 
-    private val map = Map(name = "Map1", router = routerList)
+    private val map = Map(id = "MapId1", name = "Map1", router = routerList)
     private val customer = Customer(name = "Customer1", maps = listOf(map))
 
     @Test
@@ -95,6 +97,8 @@ class ComputingServiceTest {
             assertThat(it.routerDataPoints!!.size, `is`(3))
             assertThat(it.location!!.x, `is`(correctLocation.location!!.x))
             assertThat(it.location!!.y, `is`(correctLocation.location!!.y))
+        }, check {
+            assertThat(it, `is`(map.id))
         })
 
     }
