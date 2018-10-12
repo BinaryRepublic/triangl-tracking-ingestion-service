@@ -54,7 +54,7 @@ jobs:
         name: build from dockerfile
         command: |
           docker build -t eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service .
-          docker tag eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service:$CIRCLE_SHA1
+          docker tag eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service:$CIRCLE_SHA1
     - run:
         name: push to gcr
         command: |
@@ -69,7 +69,7 @@ jobs:
     - deploy:
         name: deploy to kubernetes
         command: |
-          kubectl set image deployment/tracking-ingestion tracking-ingestion=eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service:$CIRCLE_SHA1
+          kubectl set image deployment/tracking-ingestion-service tracking-ingestion-service=eu.gcr.io/${GCLOUD_PROJECT_ID}/tracking-ingestion-service:$CIRCLE_SHA1
           kubectl rollout status deployment/tracking-ingestion-service
 workflows:
   version: 2
