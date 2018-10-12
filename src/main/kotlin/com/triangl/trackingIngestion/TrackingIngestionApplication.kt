@@ -24,11 +24,13 @@ class ObjectifyWebFilter : ObjectifyFilter()
 class TrackingIngestionApplication {
 
     @Bean
+    @Profile("production")
     @ServiceActivator(inputChannel = "pubsubOutputChannel")
     fun messageSender(pubsubTemplate: PubSubOperations): MessageHandler {
         return PubSubMessageHandler(pubsubTemplate, "test")
     }
 
+    @Profile("production")
     @MessagingGateway(defaultRequestChannel = "pubsubOutputChannel")
     interface PubsubOutboundGateway {
 
