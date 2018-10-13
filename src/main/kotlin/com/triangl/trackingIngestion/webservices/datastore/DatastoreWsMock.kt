@@ -5,7 +5,7 @@ import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.entity.Map
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
-import java.time.Instant
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -14,7 +14,7 @@ class DatastoreWsMock: DatastoreWs {
     val router1 = Router(id = "Router1", location = Coordinate(x = 1f, y = 2f))
     val router2 = Router(id = "Router2", location = Coordinate(x = 5f, y = 2f))
     val router3 = Router(id = "Router3", location = Coordinate(x = 3f, y = 5f))
-    val now = Instant.now().toString()
+    val now = LocalDateTime.now().toString()
 
     override fun saveTrackingPoint(trackingPoint: TrackingPoint): Key<TrackingPoint> = Key.create(TrackingPoint::class.java, UUID.randomUUID().toString())
 
