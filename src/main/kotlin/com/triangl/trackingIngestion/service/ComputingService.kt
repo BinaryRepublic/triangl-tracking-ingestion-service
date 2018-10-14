@@ -6,7 +6,8 @@ import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.springframework.stereotype.Service
-import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 var buffer = HashMap<String, ArrayList<DatapointGroup>>()
 
@@ -16,7 +17,6 @@ class ComputingService (
     var datastoreWs: DatastoreWs
 ) {
     fun insertToBuffer(inputDataPoint: InputDataPoint) {
-        println("--- Inserting to Buffer ---")
         if (buffer.containsKey(inputDataPoint.deviceId)) {
 
             val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { inputDataPoint.timestamp >= it.startInstant && inputDataPoint.timestamp <= it.endInstant }
@@ -42,15 +42,13 @@ class ComputingService (
             while (true) {
                 findElementsToCompute()
 
-                println("Waiting $delayTime ms ...")
                 delay(delayTime)
             }
         }
     }
 
     protected fun findElementsToCompute() {
-        val now = Instant.now().toString()
-        println("Finding elements to compute ($now) ...")
+        val now = LocalDateTime.now()
         for ((key, value) in buffer) {
             val valuesToRemove = arrayListOf<DatapointGroup>()
 
@@ -72,13 +70,14 @@ class ComputingService (
     }
 
     protected fun computeFromRSSI (datapointGroup: DatapointGroup) {
-        println("Computing ...")
         var strongestRSSI = RouterDataPoint().apply { signalStrength = 0 }
         val routerDataPointList = ArrayList<RouterDataPoint>()
         val routersToLookUp = ArrayList<String>()
 
         for (dataPoint in datapointGroup.dataPoints) {
-            val newRouterDataPoint = RouterDataPoint(router = Router(dataPoint.routerId), signalStrength = dataPoint.signalStrength, timestamp = dataPoint.timestamp)
+            val newRouterDataPoint = RouterDataPoint(router = Router(dataPoint.routerId),
+                                                     signalStrength = dataPoint.signalStrength,
+                                                     timestamp = dataPoint.timestamp.toInstant(ZoneOffset.UTC).toString())
 
             if (newRouterDataPoint.signalStrength!! > strongestRSSI.signalStrength!!) {
                 strongestRSSI = newRouterDataPoint

@@ -10,12 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
-import java.time.Instant
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class CustomerIntegrationTest {
+class TrackingIntegrationTest {
 
     @Value("\${local.server.port}")
     private val serverPort: Int = 0
@@ -31,11 +32,11 @@ class CustomerIntegrationTest {
         val routerId = "Router1"
         val deviceId = "Device1"
         val signalStrength = 255
-        val now = Instant.now().toString()
+        val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestamp\": \"$now\" }")
+                .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestampString\": \"$now\" }")
                 .post("/tracking")
                 .then()
                 .log().ifValidationFails()
@@ -49,12 +50,12 @@ class CustomerIntegrationTest {
         val routerId = "Router1"
         val deviceId = "Device1"
         val signalStrength = 255
-        val now = Instant.now().toString()
+        val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body("[{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestamp\": \"$now\" }," +
-                            " { \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestamp\": \"$now\" }]")
+                .body("[{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestampString\": \"$now\" }," +
+                            " { \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestampString\": \"$now\" }]")
                 .post("/tracking/multiple")
                 .then()
                 .log().ifValidationFails()

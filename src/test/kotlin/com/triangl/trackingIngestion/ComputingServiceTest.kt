@@ -15,7 +15,8 @@ import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import java.time.Instant
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class ComputingServiceWrapper(
     ingestionService: IngestionService,
@@ -37,10 +38,11 @@ class ComputingServiceTest {
     @InjectMocks
     private lateinit var computingService: ComputingServiceWrapper
 
-    private val now = "2018-09-25T13:49:09.404141Z"
-    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", now, 255)
-    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", now, 200)
-    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", now, 180)
+    private val nowString = "2018-09-25 13:49:09"
+    private val now = LocalDateTime.parse(nowString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", nowString, 255)
+    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", nowString, 200)
+    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", nowString, 180)
 
     private val router1 = Router("RouterId1", Coordinate(x = 1f, y = 2f))
     private val router2 = Router("RouterId2", Coordinate(x = 2f, y = 3f))
@@ -119,7 +121,7 @@ class ComputingServiceTest {
         /* Given */
         val incompleteRouter1 = Router(router1.id)
 
-        val routerDataPoint1 = RouterDataPoint(router = incompleteRouter1, timestamp = now)
+        val routerDataPoint1 = RouterDataPoint(router = incompleteRouter1, timestamp = now.toString())
         val routerDataPointList = listOf(routerDataPoint1)
 
         val routerHashMap = hashMapOf(router1.id!! to router1)

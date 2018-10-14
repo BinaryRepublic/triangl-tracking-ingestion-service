@@ -14,6 +14,7 @@ import org.springframework.integration.annotation.MessagingGateway
 import org.springframework.integration.annotation.ServiceActivator
 import org.springframework.messaging.MessageHandler
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
 
 @Component
@@ -30,7 +31,7 @@ class TrackingIngestionApplication {
         return PubSubMessageHandler(pubsubTemplate, "test")
     }
 
-    @Profile("production")
+    @Service
     @MessagingGateway(defaultRequestChannel = "pubsubOutputChannel")
     interface PubsubOutboundGateway {
 
