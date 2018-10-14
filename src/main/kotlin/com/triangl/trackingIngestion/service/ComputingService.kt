@@ -96,9 +96,12 @@ class ComputingService (
         val coordinate = Coordinate(x = strongestRSSI.router!!.location!!.x,
                                     y = strongestRSSI.router!!.location!!.y)
 
-        val newTrackingPoint = TrackingPoint(deviceId = datapointGroup.deviceId,
-                                             location = coordinate,
-                                             routerDataPoints = routerDataPointList)
+        val newTrackingPoint = TrackingPoint(
+            deviceId = datapointGroup.deviceId,
+            location = coordinate,
+            routerDataPoints = routerDataPointList,
+            timestamp = strongestRSSI.timestamp
+        )
 
         ingestionService.insertTrackingPoint(newTrackingPoint, customerObj.maps!![0].id!!)
     }

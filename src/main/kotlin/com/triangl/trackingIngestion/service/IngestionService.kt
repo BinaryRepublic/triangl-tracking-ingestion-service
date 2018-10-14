@@ -1,5 +1,8 @@
 package com.triangl.trackingIngestion.service
 
+import com.triangl.trackingIngestion.dto.PubSubAttributesAdditionalDto
+import com.triangl.trackingIngestion.dto.PubSubAttributesDto
+import com.triangl.trackingIngestion.dto.PubSubOperation
 import com.triangl.trackingIngestion.entity.TrackingPoint
 import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import com.triangl.trackingIngestion.webservices.pubsub.PubSubWs
@@ -15,7 +18,13 @@ class IngestionService (
 
         val dbTrackingPoint = datastoreWs.getTrackingPointByKey(key)
 
-        pubSubWs.sendCustomerToPubSub(dbTrackingPoint)
+        pubSubWs.publish(
+            listOf(dbTrackingPoint),
+            PubSubAttributesDto().apply {
+                operation = PubSubOperation.APPLY_TRACKING_POINT
+                additional = PubSubAttributesAdditionalDto(mapId)
+            }
+        )
 
         return dbTrackingPoint
     }

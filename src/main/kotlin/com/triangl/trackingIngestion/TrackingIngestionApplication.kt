@@ -6,15 +6,8 @@ import com.triangl.trackingIngestion.entity.Customer
 import com.triangl.trackingIngestion.entity.TrackingPoint
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.cloud.gcp.pubsub.core.PubSubOperations
-import org.springframework.cloud.gcp.pubsub.integration.outbound.PubSubMessageHandler
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Profile
-import org.springframework.integration.annotation.MessagingGateway
-import org.springframework.integration.annotation.ServiceActivator
-import org.springframework.messaging.MessageHandler
 import org.springframework.stereotype.Component
-import org.springframework.stereotype.Service
 
 
 @Component
@@ -22,22 +15,7 @@ import org.springframework.stereotype.Service
 class ObjectifyWebFilter : ObjectifyFilter()
 
 @SpringBootApplication
-class TrackingIngestionApplication {
-
-    @Bean
-    @Profile("production")
-    @ServiceActivator(inputChannel = "pubsubOutputChannel")
-    fun messageSender(pubsubTemplate: PubSubOperations): MessageHandler {
-        return PubSubMessageHandler(pubsubTemplate, "test")
-    }
-
-    @Service
-    @MessagingGateway(defaultRequestChannel = "pubsubOutputChannel")
-    interface PubsubOutboundGateway {
-
-        fun sendToPubsub(text: String)
-    }
-}
+class TrackingIngestionApplication
 
 fun main(args: Array<String>) {
 

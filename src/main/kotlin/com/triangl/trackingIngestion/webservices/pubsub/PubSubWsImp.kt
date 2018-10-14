@@ -1,23 +1,45 @@
 package com.triangl.trackingIngestion.webservices.pubsub
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.triangl.trackingIngestion.TrackingIngestionApplication
-import com.triangl.trackingIngestion.entity.TrackingPoint
-import com.triangl.trackingIngestion.pubSubEntity.OperationType
-import com.triangl.trackingIngestion.pubSubEntity.PubSubDto
-import com.triangl.trackingIngestion.pubSubEntity.PubSubMessageDto
+import com.google.api.core.ApiFuture
+import com.google.api.core.ApiFutures
+import com.google.cloud.ServiceOptions
+import com.google.cloud.pubsub.v1.Publisher
+import com.google.protobuf.ByteString
+import com.google.pubsub.v1.ProjectTopicName
+import com.google.pubsub.v1.PubsubMessage
+import com.triangl.trackingIngestion.dto.PubSubAttributesDto
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 @Profile("production")
-class PubSubWsImp (
-        private val messagingGateway: TrackingIngestionApplication.PubsubOutboundGateway
-): PubSubWs {
-    override fun sendCustomerToPubSub(trackingPoint: TrackingPoint) {
-        val pubSubEvent = PubSubMessageDto(trackingPoint, OperationType.APPLY_TRACKING_POINT)
-        val pubSubMessage = PubSubDto(listOf(pubSubEvent))
-        val jsonString = jacksonObjectMapper().writeValueAsString(pubSubMessage)
-        messagingGateway.sendToPubsub(jsonString)
+class PubSubWsImp: PubSubWs {
+
+    override fun publish(data: Any, attributes: PubSubAttributesDto) {
+        val topicId = "test"
+
+        val dataByteString = jacksonObjectMapper().writeValueAsString(data)
+
+        val topicName = ProjectTopicName.of(ServiceOptions.getDefaultProjectId(), topicId)
+        var publisher: Publisher? = null
+        val futures = ArrayList<ApiFuture<String>>()
+
+        try {
+            publisher = Publisher.newBuilder(topicName).build()
+
+            val pubsubMessage = PubsubMessage.newBuilder()
+                    .setData(ByteString.copyFromUtf8(dataByteString))
+                    .putAllAttributes(attributes.toHashMap())
+                    .build()
+
+            val future = publisher!!.publish(pubsubMessage)
+            futures.add(future)
+
+        } finally {
+            ApiFutures.allAsList(futures).get()
+            publisher?.shutdown()
+        }
     }
 }
