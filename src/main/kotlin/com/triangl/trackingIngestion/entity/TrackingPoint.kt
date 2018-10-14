@@ -16,7 +16,7 @@ class TrackingPoint (
 
     var location: Coordinate? = null,
 
-    var deleted: Boolean? = null,
+    var timestamp: String? = null,
 
     var lastUpdatedAt: String? = null,
 
@@ -26,6 +26,5 @@ class TrackingPoint (
         this.id = UUID.randomUUID().toString()
         this.lastUpdatedAt = Instant.now().toString()
         this.createdAt = Instant.now().toString()
-        this.deleted = false
     }
 }

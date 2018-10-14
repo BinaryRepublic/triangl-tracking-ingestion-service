@@ -1,7 +1,8 @@
 package com.triangl.trackingIngestion.webservices.pubsub
 
-import com.triangl.trackingIngestion.entity.TrackingPoint
+import com.triangl.trackingIngestion.dto.PubSubAttributesDto
 
 interface PubSubWs {
-    fun sendCustomerToPubSub(trackingPoint: TrackingPoint)
+
+    fun publish(data: Any, attributes: PubSubAttributesDto)
 }
