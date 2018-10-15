@@ -8,8 +8,9 @@ import kotlinx.coroutines.experimental.launch
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.concurrent.ConcurrentHashMap
 
-var buffer = HashMap<String, ArrayList<DatapointGroup>>()
+var buffer = ConcurrentHashMap<String, ArrayList<DatapointGroup>>()
 
 @Service("computingService")
 class ComputingService (
