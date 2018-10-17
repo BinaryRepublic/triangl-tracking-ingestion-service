@@ -20,7 +20,7 @@ This Service is an Endpoint for the Routers to send their DataPoints to. These D
 
     var deviceId: "TrackedDeviceId",
 
-    timestampString: "2018-10-15 09:00:00",
+    timestampString: "2018-10-15 09:00:00",   //GMT+00:00
 
     var signalStrength: 255,
 }
@@ -49,6 +49,9 @@ The computation currently works based on the RSSI (Received Signal Strength Indi
 The following Environment variables are need for this service:
 
 ```GOOGLE_APPLICATION_CREDENTIALS:{pathToGoogleKeyFile.json}```
+
+Moreover, you can set the ```pubsub.topicId``` env variable via the console
+to override the standard value ```pubsub.topicId=test```.
 
 ## Run
 - With Gradle
