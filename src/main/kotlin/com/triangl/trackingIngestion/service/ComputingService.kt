@@ -69,7 +69,7 @@ class ComputingService (
             val valuesToRemove = arrayListOf<DatapointGroup>()
 
             for (item in value) {
-                if (item.timeoutInstant < now && item.dataPoints.size >= 3) {
+                if (item.timeoutInstant < now /*&& item.dataPoints.size >= 3*/) {       //for the computing based on RSSI is 1 inputDataPoint enough
                     ObjectifyService.run { computeFromRSSI(item) }
                     valuesToRemove.add(item)
                 } else if (item.timeoutInstant < now) {
@@ -93,11 +93,12 @@ class ComputingService (
         for (dataPoint in datapointGroup.dataPoints) {
             val newRouterDataPoint = RouterDataPoint(
                 router = Router(dataPoint.routerId),
+                associatedAP = dataPoint.associatedAP,
                 signalStrength = dataPoint.signalStrength,
                 timestamp = dataPoint.timestamp.toInstant(ZoneOffset.UTC).toString()
             )
 
-            if (newRouterDataPoint.signalStrength!! > strongestRSSI.signalStrength!!) {
+            if (newRouterDataPoint.signalStrength!! < strongestRSSI.signalStrength!!) { // SignalStrength is inverted so the more it is negative the stronger is the signal
                 strongestRSSI = newRouterDataPoint
             }
 

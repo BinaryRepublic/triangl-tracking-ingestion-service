@@ -40,9 +40,9 @@ class ComputingServiceTest {
 
     private val nowString = "2018-09-25 13:49:09"
     private val now = LocalDateTime.parse(nowString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", nowString, 255)
-    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", nowString, 200)
-    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", nowString, 180)
+    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", "associatedAP",nowString, -255)
+    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", "associatedAP",nowString, -200)
+    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", "associatedAP",nowString, -180)
 
     private val router1 = Router("RouterId1", Coordinate(x = 1f, y = 2f))
     private val router2 = Router("RouterId2", Coordinate(x = 2f, y = 3f))
@@ -85,7 +85,7 @@ class ComputingServiceTest {
         /* Given */
         val datapointGroup = DatapointGroup(now, "Device1")
         datapointGroup.dataPoints.addAll(listOf(inputDataPoint1 ,inputDataPoint2 ,inputDataPoint3))
-        val highestRSSI = datapointGroup.dataPoints.maxBy { it -> it.signalStrength }
+        val highestRSSI = datapointGroup.dataPoints.minBy { it -> it.signalStrength }
         val correctLocation = routerList.first { it -> it.id == highestRSSI!!.routerId }
 
         given(datastoreWs.getRoutersById(routerList.map { it.id!! })).willReturn(customer)
