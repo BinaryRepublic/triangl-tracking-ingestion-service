@@ -1,7 +1,9 @@
 package com.triangl.trackingIngestion.controller
 
+import com.triangl.trackingIngestion.entity.DatapointGroup
 import com.triangl.trackingIngestion.entity.InputDataPoint
 import com.triangl.trackingIngestion.service.ComputingService
+import io.swagger.annotations.ApiOperation
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,6 +18,7 @@ class TrackingIngestionController (
         computingService.startBufferWatcher()
     }
 
+    @ApiOperation(value = "Inserts one InputDataPoint into the buffer for computing")
     @PostMapping("/tracking")
     fun insertToBuffer(@RequestBody inputDataPoint: InputDataPoint): ResponseEntity<Void> {
 
@@ -24,6 +27,7 @@ class TrackingIngestionController (
         return ResponseEntity.noContent().build()
     }
 
+    @ApiOperation(value = "Inserts a list of InputDataPoints into the buffer for computing")
     @PostMapping("/tracking/multiple")
     fun insertManyToBuffer(@RequestBody inputDataPoints: List<InputDataPoint>): ResponseEntity<Void> {
 
@@ -34,6 +38,7 @@ class TrackingIngestionController (
         return ResponseEntity.noContent().build()
     }
 
+    @ApiOperation(value = "Reads the content of the buffer for debugging", response = DatapointGroup::class, responseContainer = "Map")
     @GetMapping("/read")
     fun testRead(): ResponseEntity<*>{
         val buffer = computingService.readFromBuffer()

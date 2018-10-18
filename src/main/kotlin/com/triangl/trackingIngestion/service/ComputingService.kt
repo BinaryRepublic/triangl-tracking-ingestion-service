@@ -20,17 +20,32 @@ class ComputingService (
     fun insertToBuffer(inputDataPoint: InputDataPoint) {
         if (buffer.containsKey(inputDataPoint.deviceId)) {
 
-            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { inputDataPoint.timestamp >= it.startInstant && inputDataPoint.timestamp <= it.endInstant }
+            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { inputDataPoint.timestamp >= it.startInstant
+                                                                                      && inputDataPoint.timestamp <= it.endInstant }
 
             if (datapointGroup != null) {
                 datapointGroup.dataPoints.add(inputDataPoint)
             } else {
-                val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp, inputDataPoint.deviceId).apply { dataPoints.add(inputDataPoint) }
+
+                val newDatapointGroup = DatapointGroup(
+                    inputDataPoint.timestamp,
+                    inputDataPoint.deviceId
+                ).apply {
+                    dataPoints.add(inputDataPoint)
+                }
+
                 buffer[inputDataPoint.deviceId]!!.add(newDatapointGroup)
             }
 
         } else {
-            val newDatapointGroup = DatapointGroup(inputDataPoint.timestamp, inputDataPoint.deviceId).apply { dataPoints.add(inputDataPoint) }
+
+            val newDatapointGroup = DatapointGroup(
+                inputDataPoint.timestamp,
+                inputDataPoint.deviceId
+            ).apply {
+                dataPoints.add(inputDataPoint)
+            }
+
             buffer[inputDataPoint.deviceId] = arrayListOf(newDatapointGroup)
         }
     }
@@ -76,9 +91,11 @@ class ComputingService (
         val routersToLookUp = ArrayList<String>()
 
         for (dataPoint in datapointGroup.dataPoints) {
-            val newRouterDataPoint = RouterDataPoint(router = Router(dataPoint.routerId),
-                                                     signalStrength = dataPoint.signalStrength,
-                                                     timestamp = dataPoint.timestamp.toInstant(ZoneOffset.UTC).toString())
+            val newRouterDataPoint = RouterDataPoint(
+                router = Router(dataPoint.routerId),
+                signalStrength = dataPoint.signalStrength,
+                timestamp = dataPoint.timestamp.toInstant(ZoneOffset.UTC).toString()
+            )
 
             if (newRouterDataPoint.signalStrength!! > strongestRSSI.signalStrength!!) {
                 strongestRSSI = newRouterDataPoint
@@ -94,8 +111,10 @@ class ComputingService (
         addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
         strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
 
-        val coordinate = Coordinate(x = strongestRSSI.router!!.location!!.x,
-                                    y = strongestRSSI.router!!.location!!.y)
+        val coordinate = Coordinate(
+            x = strongestRSSI.router!!.location!!.x,
+            y = strongestRSSI.router!!.location!!.y
+        )
 
         val newTrackingPoint = TrackingPoint(
             deviceId = datapointGroup.deviceId,

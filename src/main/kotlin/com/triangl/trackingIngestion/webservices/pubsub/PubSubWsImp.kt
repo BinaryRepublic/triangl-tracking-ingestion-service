@@ -9,6 +9,7 @@ import com.google.protobuf.ByteString
 import com.google.pubsub.v1.ProjectTopicName
 import com.google.pubsub.v1.PubsubMessage
 import com.triangl.trackingIngestion.dto.PubSubAttributesDto
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.util.*
@@ -17,8 +18,10 @@ import java.util.*
 @Profile("production")
 class PubSubWsImp: PubSubWs {
 
+    @Value("\${pubsub.topicId}")
+    val topicId: String? = null
+
     override fun publish(data: Any, attributes: PubSubAttributesDto) {
-        val topicId = "test"
 
         val dataByteString = jacksonObjectMapper().writeValueAsString(data)
 

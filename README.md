@@ -3,6 +3,8 @@
 # Triangl-Tracking-Ingestion-Service
 **Url**: https://api.triangl.io/tracking-ingestion-service/
 
+**Full API Documentation**: https://api.triang.io/tracking-ingestion-service/swagger-ui.html
+
 **Place in the Infrastructure**: https://github.com/codeuniversity/triangl-infrastructure
 
 ## For faster development this service currently combines the Computation and the Ingestion Service that we want to have seperate in the later stage
@@ -20,7 +22,7 @@ This Service is an Endpoint for the Routers to send their DataPoints to. These D
 
     var deviceId: "TrackedDeviceId",
 
-    timestampString: "2018-10-15 09:00:00",
+    timestampString: "2018-10-15 09:00:00",   //GMT+00:00
 
     var signalStrength: 255,
 }
@@ -49,6 +51,9 @@ The computation currently works based on the RSSI (Received Signal Strength Indi
 The following Environment variables are need for this service:
 
 ```GOOGLE_APPLICATION_CREDENTIALS:{pathToGoogleKeyFile.json}```
+
+Moreover, you can set the ```pubsub.topicId``` env variable via the console
+to override the standard value ```pubsub.topicId=test```.
 
 ## Run
 - With Gradle
