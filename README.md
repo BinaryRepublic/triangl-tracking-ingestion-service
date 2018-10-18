@@ -3,6 +3,8 @@
 # Triangl-Tracking-Ingestion-Service
 **Url**: https://api.triangl.io/tracking-ingestion-service/
 
+**Full API Documentation**: https://api.triang.io/tracking-ingestion-service/swagger-ui.html
+
 **Place in the Infrastructure**: https://github.com/codeuniversity/triangl-infrastructure
 
 ## For faster development this service currently combines the Computation and the Ingestion Service that we want to have seperate in the later stage
