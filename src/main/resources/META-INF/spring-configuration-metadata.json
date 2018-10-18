@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "pubsub.topicId",
+      "type": "java.lang.String"
+    }
+  ]
+}
