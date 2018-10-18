@@ -97,7 +97,7 @@ class ComputingService (
                 timestamp = dataPoint.timestamp.toInstant(ZoneOffset.UTC).toString()
             )
 
-            if (newRouterDataPoint.signalStrength!! > strongestRSSI.signalStrength!!) {
+            if (newRouterDataPoint.signalStrength!! < strongestRSSI.signalStrength!!) { // SignalStrength is inverted so the more it is negative the stronger is the signal
                 strongestRSSI = newRouterDataPoint
             }
 
