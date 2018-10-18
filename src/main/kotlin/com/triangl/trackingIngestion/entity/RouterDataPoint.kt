@@ -9,6 +9,8 @@ class RouterDataPoint (
 
     var router: Router? = null,
 
+    var associatedAP: String? = null,
+
     var signalStrength: Int? = null,
 
     var timeOfFlight: Long? = null,
