@@ -21,16 +21,21 @@ class TrackingIngestionController (
     }
 
     @ApiOperation(value = "Inserts one InputDataPoint into the buffer for computing")
+    @ApiResponses(value = [(ApiResponse(code = 400, message = "Router ID not found"))])
     @PostMapping("/tracking")
     fun insertToBuffer(@RequestBody inputDataPoint: InputDataPoint): ResponseEntity<*> {
 
-        computingService.insertToBuffer(inputDataPoint)
+        return if (computingService.isRouterValid(inputDataPoint.routerId)) {
+            computingService.insertToBuffer(inputDataPoint)
 
-        return ResponseEntity.noContent().build<Any>()
+            ResponseEntity.noContent().build<Any>()
+        } else {
+            ResponseEntity.status(400).body(hashMapOf("error" to "Router ID not found"))
+        }
     }
 
     @ApiOperation(value = "Inserts a list of InputDataPoints into the buffer for computing")
-    @ApiResponses(value = [(ApiResponse(code = 400, message = "Customer ID not found"))])
+    @ApiResponses(value = [(ApiResponse(code = 400, message = "Router ID not found"))])
     @PostMapping("/tracking/multiple")
     fun insertManyToBuffer(@RequestBody inputDataPoints: List<InputDataPoint>): ResponseEntity<*> {
 
