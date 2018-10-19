@@ -63,6 +63,9 @@ class ComputingService (
         }
     }
 
+    fun isRouterValid(routerId: String) =
+        datastoreWs.getCustomerByRouterId(routerId) != null
+
     protected fun findElementsToCompute() {
         val now = LocalDateTime.now()
         for ((key, value) in buffer) {
@@ -105,28 +108,25 @@ class ComputingService (
             routersToLookUp.add(dataPoint.routerId)
         }
 
-        val customerObj = datastoreWs.getRoutersById(routersToLookUp)
+        val customerObj = datastoreWs.getCustomerByRouterId(routersToLookUp[0])
+        val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj!!)
 
-        if (customerObj != null) {
-            val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj)
+        addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
+        strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
 
-            addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
-            strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
+        val coordinate = Coordinate(
+            x = strongestRSSI.router!!.location!!.x,
+            y = strongestRSSI.router!!.location!!.y
+        )
 
-            val coordinate = Coordinate(
-                x = strongestRSSI.router!!.location!!.x,
-                y = strongestRSSI.router!!.location!!.y
-            )
+        val newTrackingPoint = TrackingPoint(
+            deviceId = datapointGroup.deviceId,
+            location = coordinate,
+            routerDataPoints = routerDataPointList,
+            timestamp = strongestRSSI.timestamp
+        )
 
-            val newTrackingPoint = TrackingPoint(
-                deviceId = datapointGroup.deviceId,
-                location = coordinate,
-                routerDataPoints = routerDataPointList,
-                timestamp = strongestRSSI.timestamp
-            )
-
-            ingestionService.insertTrackingPoint(newTrackingPoint, customerObj.maps!![0].id!!)
-        }
+        ingestionService.insertTrackingPoint(newTrackingPoint, customerObj.maps!![0].id!!)
     }
 
     protected fun parseCustomerRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {

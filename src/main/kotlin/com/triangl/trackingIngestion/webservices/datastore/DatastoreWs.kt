@@ -7,5 +7,5 @@ import com.triangl.trackingIngestion.entity.TrackingPoint
 interface DatastoreWs {
     fun saveTrackingPoint(trackingPoint: TrackingPoint): Key<TrackingPoint>
     fun getTrackingPointByKey(key: Key<TrackingPoint>): TrackingPoint
-    fun getRoutersById(IDList: List<String>): Customer?
+    fun getCustomerByRouterId(routerId: String): Customer?
 }
