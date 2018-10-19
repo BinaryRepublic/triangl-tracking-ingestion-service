@@ -27,7 +27,7 @@ class DatastoreWsMock: DatastoreWs {
         return TrackingPoint(routerDataPoints = routerDataList, deviceId = "Device1", location = Coordinate(x = 3f, y = 5f))
     }
 
-    override fun getRoutersById(IDList: List<String>): Customer {
+    override fun getRoutersById(IDList: List<String>): Customer? {
         val map = Map(name = "Map1", svgPath = "/dir", size =  Coordinate(x = 10f, y = 10f), router = arrayListOf(router1, router2, router3))
 
         return Customer("Customer").apply { maps = listOf(map) }

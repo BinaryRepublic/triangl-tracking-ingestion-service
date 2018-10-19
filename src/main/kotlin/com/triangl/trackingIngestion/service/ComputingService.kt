@@ -106,24 +106,27 @@ class ComputingService (
         }
 
         val customerObj = datastoreWs.getRoutersById(routersToLookUp)
-        val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj)
 
-        addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
-        strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
+        if (customerObj != null) {
+            val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj)
 
-        val coordinate = Coordinate(
-            x = strongestRSSI.router!!.location!!.x,
-            y = strongestRSSI.router!!.location!!.y
-        )
+            addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
+            strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
 
-        val newTrackingPoint = TrackingPoint(
-            deviceId = datapointGroup.deviceId,
-            location = coordinate,
-            routerDataPoints = routerDataPointList,
-            timestamp = strongestRSSI.timestamp
-        )
+            val coordinate = Coordinate(
+                x = strongestRSSI.router!!.location!!.x,
+                y = strongestRSSI.router!!.location!!.y
+            )
 
-        ingestionService.insertTrackingPoint(newTrackingPoint, customerObj.maps!![0].id!!)
+            val newTrackingPoint = TrackingPoint(
+                deviceId = datapointGroup.deviceId,
+                location = coordinate,
+                routerDataPoints = routerDataPointList,
+                timestamp = strongestRSSI.timestamp
+            )
+
+            ingestionService.insertTrackingPoint(newTrackingPoint, customerObj.maps!![0].id!!)
+        }
     }
 
     protected fun parseCustomerRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
