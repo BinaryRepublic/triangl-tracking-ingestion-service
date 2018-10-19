@@ -20,10 +20,13 @@ class TrackingPoint (
     @Index
     var location: Coordinate? = null,
 
+    @Index
     var timestamp: String? = null,
 
+    @Index
     var lastUpdatedAt: String? = null,
 
+    @Index
     var createdAt: String? = null
 ) {
     init {
