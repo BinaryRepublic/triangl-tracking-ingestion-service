@@ -88,7 +88,7 @@ class ComputingServiceTest {
         val highestRSSI = datapointGroup.dataPoints.minBy { it -> it.signalStrength }
         val correctLocation = routerList.first { it -> it.id == highestRSSI!!.routerId }
 
-        given(datastoreWs.getRoutersById(routerList.map { it.id!! })).willReturn(customer)
+        given(datastoreWs.getCustomerByRouterId(routerList.map { it.id!! }[0])).willReturn(customer)
 
         /* When */
         computingService.computeFromRSSIPublic(datapointGroup)

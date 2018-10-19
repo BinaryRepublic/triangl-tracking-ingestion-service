@@ -63,6 +63,9 @@ class ComputingService (
         }
     }
 
+    fun isRouterValid(routerId: String) =
+        datastoreWs.getCustomerByRouterId(routerId) != null
+
     protected fun findElementsToCompute() {
         val now = LocalDateTime.now()
         for ((key, value) in buffer) {
@@ -106,8 +109,8 @@ class ComputingService (
             routersToLookUp.add(dataPoint.routerId)
         }
 
-        val customerObj = datastoreWs.getRoutersById(routersToLookUp)
-        val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj)
+        val customerObj = datastoreWs.getCustomerByRouterId(routersToLookUp[0])
+        val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj!!)
 
         addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
         strongestRSSI.router = routerHashMap[strongestRSSI.router!!.id]
