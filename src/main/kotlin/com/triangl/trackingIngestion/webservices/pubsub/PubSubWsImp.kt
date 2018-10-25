@@ -41,7 +41,7 @@ class PubSubWsImp: PubSubWs {
             futures.add(future)
 
         } finally {
-            ApiFutures.allAsList(futures).get()
+            //ApiFutures.allAsList(futures).get()
             publisher?.shutdown()
         }
     }
