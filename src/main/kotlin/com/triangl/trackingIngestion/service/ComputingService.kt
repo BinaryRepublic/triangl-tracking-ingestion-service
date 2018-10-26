@@ -3,6 +3,7 @@ package com.triangl.trackingIngestion.service
 import com.googlecode.objectify.ObjectifyService
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
+import io.grpc.netty.shaded.io.netty.util.internal.ConcurrentSet
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.springframework.stereotype.Service
@@ -10,7 +11,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.concurrent.ConcurrentHashMap
 
-var buffer = ConcurrentHashMap<String, ArrayList<DatapointGroup>>()
+var buffer = ConcurrentHashMap<String, ConcurrentSet<DatapointGroup>>()
 
 @Service("computingService")
 class ComputingService (
@@ -43,12 +44,13 @@ class ComputingService (
             ).apply {
                 dataPoints.add(inputDataPoint)
             }
-
-            buffer[inputDataPoint.deviceId] = arrayListOf(newDatapointGroup)
+            val datapointGroups = ConcurrentSet<DatapointGroup>()
+            datapointGroups.add(newDatapointGroup)
+            buffer[inputDataPoint.deviceId] = datapointGroups
         }
     }
 
-    fun readFromBuffer(): MutableMap<String, ArrayList<DatapointGroup>> = buffer
+    fun readFromBuffer(): MutableMap<String, ConcurrentSet<DatapointGroup>> = buffer
 
     fun startBufferWatcher() {
         val delayTime = 5000
@@ -66,7 +68,7 @@ class ComputingService (
 
     protected fun findElementsToCompute() {
         val now = LocalDateTime.now()
-        buffer.forEach { deviceId: String, datapointGroups: ArrayList<DatapointGroup> ->
+        buffer.forEach { deviceId: String, datapointGroups: ConcurrentSet<DatapointGroup> ->
             val valuesToRemove = arrayListOf<DatapointGroup>()
 
             datapointGroups.forEach {datapointGroup ->
