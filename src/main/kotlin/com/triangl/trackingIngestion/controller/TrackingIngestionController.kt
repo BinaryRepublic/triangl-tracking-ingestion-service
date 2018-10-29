@@ -24,10 +24,8 @@ class TrackingIngestionController (
     @ApiResponses(value = [(ApiResponse(code = 400, message = "Router ID not found"))])
     @PostMapping("/tracking")
     fun insertToBuffer(@RequestBody inputDataPoint: InputDataPoint): ResponseEntity<*> {
-
         return if (computingService.isRouterValid(inputDataPoint.routerId)) {
             computingService.insertToBuffer(inputDataPoint)
-
             ResponseEntity.noContent().build<Any>()
         } else {
             ResponseEntity.status(400).body(hashMapOf("error" to "Router ID not found"))
@@ -38,15 +36,15 @@ class TrackingIngestionController (
     @ApiResponses(value = [(ApiResponse(code = 400, message = "Router ID not found"))])
     @PostMapping("/tracking/multiple")
     fun insertManyToBuffer(@RequestBody inputDataPoints: List<InputDataPoint>): ResponseEntity<*> {
-
-        return if (computingService.isRouterValid(inputDataPoints[0].routerId)) {
-            inputDataPoints.forEach {
-                computingService.insertToBuffer(it)
-            }
-
-            ResponseEntity.noContent().build<Any>()
+        val routerIds = inputDataPoints.map{it.routerId}.distinct()
+        val invalidIds = routerIds.filter { !computingService.isRouterValid(it) }
+        return if (invalidIds.isNotEmpty()) {
+            ResponseEntity.status(400).body(hashMapOf("error" to "the collection contains invalid routerIds: $invalidIds"))
         } else {
-            ResponseEntity.status(400).body(hashMapOf("error" to "Router ID not found"))
+            inputDataPoints.forEach {inputDataPoint ->
+                computingService.insertToBuffer(inputDataPoint)
+            }
+            ResponseEntity.noContent().build<Any>()
         }
     }
 

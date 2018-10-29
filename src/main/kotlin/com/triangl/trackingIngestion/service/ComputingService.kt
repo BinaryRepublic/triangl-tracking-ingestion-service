@@ -89,25 +89,20 @@ class ComputingService (
     }
 
     protected fun computeFromRSSI (datapointGroup: DatapointGroup) {
-        var strongestRSSI = RouterDataPoint().apply { signalStrength = 0 }
-        val routerDataPointList = ArrayList<RouterDataPoint>()
-        val routersToLookUp = ArrayList<String>()
-
-        for (dataPoint in datapointGroup.dataPoints) {
-            val newRouterDataPoint = RouterDataPoint(
-                router = Router(dataPoint.routerId),
-                associatedAP = dataPoint.associatedAP,
-                signalStrength = dataPoint.signalStrength,
-                timestamp = dataPoint.timestamp.toInstant(ZoneOffset.UTC).toString()
-            )
-
-            if (newRouterDataPoint.signalStrength!! < strongestRSSI.signalStrength!!) { // SignalStrength is inverted so the more it is negative the stronger is the signal
-                strongestRSSI = newRouterDataPoint
-            }
-
-            routerDataPointList.add(newRouterDataPoint)
-            routersToLookUp.add(dataPoint.routerId)
+        if (datapointGroup.dataPoints.isEmpty()) {
+            return
         }
+
+        val routerDataPointList = datapointGroup.dataPoints.map {
+            RouterDataPoint(
+                router = Router(it.routerId),
+                associatedAP = it.associatedAP,
+                signalStrength = it.signalStrength,
+                timestamp = it.timestamp.toInstant(ZoneOffset.UTC).toString()
+            )
+        }
+        val strongestRSSI = routerDataPointList.minBy { it.signalStrength!! }!!
+        val routersToLookUp = datapointGroup.dataPoints.map { it.routerId }
 
         val customerObj = datastoreWs.getCustomerByRouterId(routersToLookUp[0])
         val routerHashMap = parseCustomerRoutersIntoHashmap(customerObj!!)
