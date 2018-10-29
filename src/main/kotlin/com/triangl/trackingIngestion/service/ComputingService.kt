@@ -3,6 +3,7 @@ package com.triangl.trackingIngestion.service
 import com.googlecode.objectify.ObjectifyService
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
+import io.grpc.netty.shaded.io.netty.util.internal.ConcurrentSet
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.springframework.stereotype.Service
@@ -10,7 +11,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.concurrent.ConcurrentHashMap
 
-var buffer = ConcurrentHashMap<String, ArrayList<DatapointGroup>>()
+var buffer = ConcurrentHashMap<String, ConcurrentSet<DatapointGroup>>()
 
 @Service("computingService")
 class ComputingService (
@@ -19,14 +20,14 @@ class ComputingService (
 ) {
     fun insertToBuffer(inputDataPoint: InputDataPoint) {
         if (buffer.containsKey(inputDataPoint.deviceId)) {
-
-            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find { inputDataPoint.timestamp >= it.startInstant
-                                                                                      && inputDataPoint.timestamp <= it.endInstant }
+            val datapointGroup = buffer[inputDataPoint.deviceId]!!.find {
+                inputDataPoint.timestamp >= it.startInstant &&
+                inputDataPoint.timestamp <= it.endInstant
+            }
 
             if (datapointGroup != null) {
                 datapointGroup.dataPoints.add(inputDataPoint)
             } else {
-
                 val newDatapointGroup = DatapointGroup(
                     inputDataPoint.timestamp,
                     inputDataPoint.deviceId
@@ -36,21 +37,20 @@ class ComputingService (
 
                 buffer[inputDataPoint.deviceId]!!.add(newDatapointGroup)
             }
-
         } else {
-
             val newDatapointGroup = DatapointGroup(
                 inputDataPoint.timestamp,
                 inputDataPoint.deviceId
             ).apply {
                 dataPoints.add(inputDataPoint)
             }
-
-            buffer[inputDataPoint.deviceId] = arrayListOf(newDatapointGroup)
+            val datapointGroups = ConcurrentSet<DatapointGroup>()
+            datapointGroups.add(newDatapointGroup)
+            buffer[inputDataPoint.deviceId] = datapointGroups
         }
     }
 
-    fun readFromBuffer():MutableMap<String, ArrayList<DatapointGroup>> = buffer
+    fun readFromBuffer(): MutableMap<String, ConcurrentSet<DatapointGroup>> = buffer
 
     fun startBufferWatcher() {
         val delayTime = 5000
@@ -68,22 +68,22 @@ class ComputingService (
 
     protected fun findElementsToCompute() {
         val now = LocalDateTime.now()
-        for ((key, value) in buffer) {
+        buffer.forEach { deviceId: String, datapointGroups: ConcurrentSet<DatapointGroup> ->
             val valuesToRemove = arrayListOf<DatapointGroup>()
 
-            for (item in value) {
-                if (item.timeoutInstant < now /*&& item.dataPoints.size >= 3*/) {       //for the computing based on RSSI is 1 inputDataPoint enough
-                    ObjectifyService.run { computeFromRSSI(item) }
-                    valuesToRemove.add(item)
-                } else if (item.timeoutInstant < now) {
-                    valuesToRemove.add(item)
+            datapointGroups.forEach {datapointGroup ->
+                if (datapointGroup.timeoutInstant < now /*&& datapointGroup.size >= 3*/) {       //for the computing based on RSSI is 1 inputDataPoint enough
+                    ObjectifyService.run { computeFromRSSI(datapointGroup) }
+                    valuesToRemove.add(datapointGroup)
+                } else if (datapointGroup.timeoutInstant < now) {
+                    valuesToRemove.add(datapointGroup)
                 }
             }
 
-            value.removeAll(valuesToRemove)
+            datapointGroups.removeAll(valuesToRemove)
 
-            if (value.size == 0) {
-                buffer.remove(key)
+            if (datapointGroups.size == 0) {
+                buffer.remove(deviceId)
             }
         }
     }
