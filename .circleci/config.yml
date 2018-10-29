@@ -79,12 +79,12 @@ workflows:
     - push_to_gcr:
         requires:
         - build
-#        filters:
-#          branches:
-#            only: master
+        filters:
+          branches:
+            only: master
     - deploy_to_k8s:
         requires:
         - push_to_gcr
-#        filters:
-#          branches:
-#            only: master
+        filters:
+          branches:
+            only: master
