@@ -30,8 +30,8 @@ class TrackingPoint (
     var createdAt: String? = null
 ) {
     init {
-        this.id = UUID.randomUUID().toString()
-        this.lastUpdatedAt = Instant.now().toString()
-        this.createdAt = Instant.now().toString()
+        this.id ?: UUID.randomUUID().toString()
+        this.lastUpdatedAt ?: Instant.now().toString()
+        this.createdAt ?: Instant.now().toString()
     }
 }

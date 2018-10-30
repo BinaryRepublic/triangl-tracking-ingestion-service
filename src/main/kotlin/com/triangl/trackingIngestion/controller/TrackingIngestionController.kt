@@ -3,6 +3,7 @@ package com.triangl.trackingIngestion.controller
 import com.triangl.trackingIngestion.entity.DatapointGroup
 import com.triangl.trackingIngestion.entity.InputDataPoint
 import com.triangl.trackingIngestion.service.ComputingService
+import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
@@ -14,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class TrackingIngestionController (
-    private val computingService: ComputingService
+    private val computingService: ComputingService,
+    private val datastoreWs: DatastoreWs
 ) {
     init {
         computingService.startBufferWatcher()
@@ -54,5 +56,26 @@ class TrackingIngestionController (
         val buffer = computingService.readFromBuffer()
 
         return ResponseEntity.ok().body(hashMapOf("buffer" to buffer))
+    }
+
+    @GetMapping("/routers/lastSeen")
+    fun getRoutersLastSeen(): ResponseEntity<*> {
+        val routersLastSeen = computingService.getRoutersLastSeen()
+
+        return ResponseEntity.ok().body(routersLastSeen)
+    }
+
+    @GetMapping("/count")
+    fun count(): ResponseEntity<*>{
+        val result = datastoreWs.count()
+
+        return ResponseEntity.ok().body(result)
+    }
+
+    @GetMapping("test")
+    fun test(): ResponseEntity<*>{
+        val result = datastoreWs.test()
+
+        return ResponseEntity.ok().body(result)
     }
 }
