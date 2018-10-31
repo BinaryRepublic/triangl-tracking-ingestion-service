@@ -1,9 +1,9 @@
 package com.triangl.trackingIngestion.controller
 
+import com.triangl.trackingIngestion.dto.RouterLastSeenDto
 import com.triangl.trackingIngestion.entity.DatapointGroup
 import com.triangl.trackingIngestion.entity.InputDataPoint
 import com.triangl.trackingIngestion.service.ComputingService
-import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class TrackingIngestionController (
-    private val computingService: ComputingService,
-    private val datastoreWs: DatastoreWs
+    private val computingService: ComputingService
 ) {
     init {
         computingService.startBufferWatcher()
@@ -58,24 +57,11 @@ class TrackingIngestionController (
         return ResponseEntity.ok().body(hashMapOf("buffer" to buffer))
     }
 
+    @ApiOperation(value = "Gets the timestamp for each Router when it was last sending packages", response = RouterLastSeenDto::class, responseContainer = "List")
     @GetMapping("/routers/lastSeen")
     fun getRoutersLastSeen(): ResponseEntity<*> {
         val routersLastSeen = computingService.getRoutersLastSeen()
 
         return ResponseEntity.ok().body(routersLastSeen)
-    }
-
-    @GetMapping("/count")
-    fun count(): ResponseEntity<*>{
-        val result = datastoreWs.count()
-
-        return ResponseEntity.ok().body(result)
-    }
-
-    @GetMapping("test")
-    fun test(): ResponseEntity<*>{
-        val result = datastoreWs.test()
-
-        return ResponseEntity.ok().body(result)
     }
 }

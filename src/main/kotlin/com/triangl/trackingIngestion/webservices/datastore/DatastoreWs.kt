@@ -9,6 +9,5 @@ interface DatastoreWs {
     fun saveTrackingPoint(trackingPoint: TrackingPoint): Key<TrackingPoint>
     fun getTrackingPointByKey(key: Key<TrackingPoint>): TrackingPoint
     fun getCustomerByRouterId(routerId: String): Customer?
-    fun test(): List<RouterLastSeenDto>
-    fun count(): Int
+    fun getRoutersLastSeen(): List<RouterLastSeenDto>
 }
