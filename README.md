@@ -26,7 +26,7 @@ This Service is an Endpoint for the Routers to send their DataPoints to. These D
 
     timestampString: "2018-10-15 09:00:00",   //GMT+00:00
 
-    var signalStrength: -255,
+    var signalStrength: -255
 }
 ```
 The service then:
