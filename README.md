@@ -11,8 +11,10 @@
 
 ## Routes
 
-- Send one DataPoint POST /tracking
-- Send multiple DataPoints POST /tracking/multiple
+- Send one DataPoint **POST** /tracking
+- Send multiple DataPoints **POST** /tracking/multiple
+- Get Routers lastSeen Timestamp **GET** /routers/lastSeen
+- Read the buffer **GET** /read
 
 ## What does it do
 This Service is an Endpoint for the Routers to send their DataPoints to. These DataPoints currently look the like the following:
@@ -24,7 +26,7 @@ This Service is an Endpoint for the Routers to send their DataPoints to. These D
 
     timestampString: "2018-10-15 09:00:00",   //GMT+00:00
 
-    var signalStrength: 255,
+    var signalStrength: -255,
 }
 ```
 The service then:
@@ -37,7 +39,7 @@ The [Pipeline](https://github.com/codeuniversity/triangl-processing-pipeline) ca
 ## ComputeLocation function
 The location calculation function works in the following way:
 
-It starts in a seconde [kotlin coroutine](https://kotlinlang.org/docs/reference/coroutines-overview.html) and then checks
+It starts in a second [kotlin coroutine](https://kotlinlang.org/docs/reference/coroutines-overview.html) and then checks
 every 5 seconds if there are some locations to compute.
 
 The computation currently works based on the RSSI (Received Signal Strength Indication). The location of the TrackedDevice is currently the location of the nearest router that tracked him.
