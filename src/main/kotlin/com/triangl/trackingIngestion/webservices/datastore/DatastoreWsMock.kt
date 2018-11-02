@@ -1,6 +1,7 @@
 package com.triangl.trackingIngestion.webservices.datastore
 
 import com.googlecode.objectify.Key
+import com.triangl.trackingIngestion.dto.RouterLastSeenDto
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.entity.Map
 import org.springframework.context.annotation.Profile
@@ -11,6 +12,10 @@ import java.util.*
 @Service
 @Profile("test")
 class DatastoreWsMock: DatastoreWs {
+    override fun getRouterLastSeenList(): List<RouterLastSeenDto> {
+        return listOf(RouterLastSeenDto("",""))
+    }
+
     val router1 = Router(id = "Router1", location = Coordinate(x = 1f, y = 2f))
     val router2 = Router(id = "Router2", location = Coordinate(x = 5f, y = 2f))
     val router3 = Router(id = "Router3", location = Coordinate(x = 3f, y = 5f))
