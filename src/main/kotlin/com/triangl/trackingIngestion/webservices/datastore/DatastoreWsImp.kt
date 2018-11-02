@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 @Profile("production")
 class DatastoreWsImp: DatastoreWs {
-    override fun getRoutersLastSeen(): List<RouterLastSeenDto> {
+    override fun getRouterLastSeenList(): List<RouterLastSeenDto> {
         val datastore = DatastoreOptions.getDefaultInstance().service
 
         val query = Query.newProjectionEntityQueryBuilder()

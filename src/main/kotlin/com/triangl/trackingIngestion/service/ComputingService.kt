@@ -53,7 +53,7 @@ class ComputingService (
 
     fun readFromBuffer(): MutableMap<String, ConcurrentSet<DatapointGroup>> = buffer
 
-    fun getRoutersLastSeen(): List<RouterLastSeenDto> = datastoreWs.getRoutersLastSeen()
+    fun getRoutersLastSeen(): List<RouterLastSeenDto> = datastoreWs.getRouterLastSeenList()
 
     fun startBufferWatcher() {
         val delayTime = 5000

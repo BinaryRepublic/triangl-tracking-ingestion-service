@@ -12,8 +12,8 @@ import java.util.*
 @Service
 @Profile("test")
 class DatastoreWsMock: DatastoreWs {
-    override fun getRoutersLastSeen(): List<RouterLastSeenDto> {
-        return mutableListOf(RouterLastSeenDto("",""))
+    override fun getRouterLastSeenList(): List<RouterLastSeenDto> {
+        return listOf(RouterLastSeenDto("",""))
     }
 
     val router1 = Router(id = "Router1", location = Coordinate(x = 1f, y = 2f))
