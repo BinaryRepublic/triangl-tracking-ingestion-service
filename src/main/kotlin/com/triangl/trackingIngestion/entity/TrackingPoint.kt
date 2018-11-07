@@ -12,7 +12,7 @@ class TrackingPoint (
     var id: String? = null,
 
     @Index
-    var routerDataPoints: List<RouterDataPoint>? = null,
+    var routerDataPoints: List<RouterDataPoint>,
 
     @Index
     var deviceId: String? = null,
@@ -33,5 +33,30 @@ class TrackingPoint (
         this.id ?: UUID.randomUUID().toString()
         this.lastUpdatedAt ?: Instant.now().toString()
         this.createdAt ?: Instant.now().toString()
+    }
+
+    fun parseCustomerRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
+        val hashMap = HashMap<String, Router>()
+
+        for (map in customer.maps!!) {
+            for (router in map.router!!) {
+                hashMap[router.id!!] = router
+            }
+        }
+
+        return hashMap
+    }
+
+    fun fillMissingRouterCoordinates(routerHashMap: HashMap<String, Router>) {
+        for (routerDataPoint in routerDataPoints) {
+            routerDataPoint.router = routerHashMap[routerDataPoint.router!!.id]
+        }
+    }
+
+    fun setLocationFromRouterDataPoint(strongestRouterDataPoint: RouterDataPoint) {
+        location = Coordinate(
+            x = strongestRouterDataPoint.router!!.location!!.x,
+            y = strongestRouterDataPoint.router!!.location!!.y
+        )
     }
 }

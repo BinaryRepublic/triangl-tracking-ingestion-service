@@ -1,13 +1,12 @@
 package com.triangl.trackingIngestion
 
-import com.nhaarman.mockito_kotlin.check
 import com.nhaarman.mockito_kotlin.given
-import com.nhaarman.mockito_kotlin.verify
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.entity.Map
 import com.triangl.trackingIngestion.service.ComputingService
 import com.triangl.trackingIngestion.service.IngestionService
 import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
+import io.grpc.netty.shaded.io.netty.util.internal.ConcurrentSet
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.Test
@@ -38,11 +37,11 @@ class ComputingServiceTest {
     @InjectMocks
     private lateinit var computingService: ComputingServiceWrapper
 
-    private val nowString = "2018-09-25 13:49:09"
-    private val now = LocalDateTime.parse(nowString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", "associatedAP",nowString, -255)
-    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", "associatedAP",nowString, -200)
-    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", "associatedAP",nowString, -180)
+    private val timeStampString = "2018-09-25 13:49:09"
+    private val timeStamp = LocalDateTime.parse(timeStampString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", "associatedAP",timeStampString, -255)
+    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", "associatedAP",timeStampString, -200)
+    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", "associatedAP",timeStampString, -180)
 
     private val router1 = Router("RouterId1", Coordinate(x = 1f, y = 2f))
     private val router2 = Router("RouterId2", Coordinate(x = 2f, y = 3f))
@@ -81,9 +80,27 @@ class ComputingServiceTest {
     }
 
     @Test
-    fun `should compute and insert new TrackingPoint`() {
+    fun `should find elements to compute`() {
         /* Given */
-        val datapointGroup = DatapointGroup(now, "Device1")
+        val datapointGroup = DatapointGroup(timeStamp, inputDataPoint1.deviceId)
+        datapointGroup.dataPoints.addAll(listOf(inputDataPoint1 ,inputDataPoint2 ,inputDataPoint3))
+
+        val datapointGroupList = ConcurrentSet<DatapointGroup>()
+        datapointGroupList.add(datapointGroup)
+
+        /* When */
+        val elementsToCompute = computingService.findElementsToCompute(datapointGroupList, "DeviceId1")
+
+        /* Then */
+        assertThat(elementsToCompute.size, `is`(1))
+        assertThat(elementsToCompute[0].dataPoints.size, `is`(3))
+        assertThat(elementsToCompute[0].deviceId, `is`(inputDataPoint1.deviceId))
+    }
+
+    @Test
+    fun `should compute new TrackingPoint`() {
+        /* Given */
+        val datapointGroup = DatapointGroup(timeStamp, "Device1")
         datapointGroup.dataPoints.addAll(listOf(inputDataPoint1 ,inputDataPoint2 ,inputDataPoint3))
         val highestRSSI = datapointGroup.dataPoints.minBy { it -> it.signalStrength }
         val correctLocation = routerList.first { it -> it.id == highestRSSI!!.routerId }
@@ -91,18 +108,16 @@ class ComputingServiceTest {
         given(datastoreWs.getCustomerByRouterId(routerList.map { it.id!! }[0])).willReturn(customer)
 
         /* When */
-        computingService.computeFromRSSIPublic(datapointGroup)
+        val computedTrackingPoint = computingService.computeFromRSSIPublic(datapointGroup)
 
         /* Then */
-        verify(ingestionService).insertTrackingPoint(check {
-            assertThat(it.deviceId, `is`(datapointGroup.deviceId))
-            assertThat(it.routerDataPoints!!.size, `is`(3))
-            assertThat(it.location!!.x, `is`(correctLocation.location!!.x))
-            assertThat(it.location!!.y, `is`(correctLocation.location!!.y))
-        }, check {
-            assertThat(it, `is`(map.id))
-        })
-
+        with(computedTrackingPoint!!.first){
+            assertThat(this.deviceId, `is`(datapointGroup.deviceId))
+            assertThat(this.routerDataPoints!!.size, `is`(3))
+            assertThat(this.location!!.x, `is`(correctLocation.location!!.x))
+            assertThat(this.location!!.y, `is`(correctLocation.location!!.y))
+        }
+        assertThat(computedTrackingPoint!!.second, `is`(map.id))
     }
 
     @Test
@@ -121,7 +136,7 @@ class ComputingServiceTest {
         /* Given */
         val incompleteRouter1 = Router(router1.id)
 
-        val routerDataPoint1 = RouterDataPoint(router = incompleteRouter1, timestamp = now.toString())
+        val routerDataPoint1 = RouterDataPoint(router = incompleteRouter1, timestamp = timeStamp.toString())
         val routerDataPointList = listOf(routerDataPoint1)
 
         val routerHashMap = hashMapOf(router1.id!! to router1)
