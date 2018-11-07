@@ -1,8 +1,8 @@
 package com.triangl.trackingIngestion.service
 
 import com.googlecode.objectify.ObjectifyService
-import com.triangl.trackingIngestion.dto.RouterLastSeenDto
 import com.triangl.trackingIngestion.`class`.Buffer
+import com.triangl.trackingIngestion.dto.RouterLastSeenDto
 import com.triangl.trackingIngestion.entity.*
 import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import io.grpc.netty.shaded.io.netty.util.internal.ConcurrentSet
@@ -24,6 +24,12 @@ class ComputingService (
 
     fun readFromBuffer(): MutableMap<String, ConcurrentSet<DatapointGroup>> =
         buffer.read()
+
+    fun getRoutersLastSeen(): List<RouterLastSeenDto> =
+        datastoreWs.getRouterLastSeenList()
+
+    fun isRouterValid(routerId: String) =
+        datastoreWs.getCustomerByRouterId(routerId) != null
 
     fun startBufferWatcher() {
         val sleepTime = 5000
@@ -55,11 +61,6 @@ class ComputingService (
             }
         }
     }
-
-    fun getRoutersLastSeen(): List<RouterLastSeenDto> = datastoreWs.getRouterLastSeenList()
-
-    fun isRouterValid(routerId: String) =
-        datastoreWs.getCustomerByRouterId(routerId) != null
 
     fun findElementsToCompute(datapointGroups: ConcurrentSet<DatapointGroup>, deviceId: String):ArrayList<DatapointGroup> {
         val now = LocalDateTime.now()
