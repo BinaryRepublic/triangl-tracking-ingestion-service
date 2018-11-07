@@ -14,17 +14,7 @@ import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-class ComputingServiceWrapper(
-    ingestionService: IngestionService,
-    datastoreWs: DatastoreWs
-): ComputingService(ingestionService, datastoreWs) {
-    fun computeFromRSSIPublic(datapointGroup: DatapointGroup) = computeFromRSSI(datapointGroup)
-    fun parseCustomerRoutersIntoHashmapPublic(customer: Customer): HashMap<String, Router> = parseCustomerRoutersIntoHashmap(customer)
-    fun addRouterToRouterDataPointsPublic(routerDataPointList: List<RouterDataPoint>, routerHashMap: HashMap<String, Router>) = addRouterToRouterDataPoints(routerDataPointList, routerHashMap)
-}
+import java.time.ZoneOffset
 
 @RunWith(MockitoJUnitRunner::class)
 class ComputingServiceTest {
@@ -35,10 +25,9 @@ class ComputingServiceTest {
     private lateinit var datastoreWs: DatastoreWs
 
     @InjectMocks
-    private lateinit var computingService: ComputingServiceWrapper
+    private lateinit var computingService: ComputingService
 
     private val timeStampString = "2018-09-25 13:49:09"
-    private val timeStamp = LocalDateTime.parse(timeStampString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", "associatedAP",timeStampString, -255)
     private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", "associatedAP",timeStampString, -200)
     private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", "associatedAP",timeStampString, -180)
@@ -52,38 +41,10 @@ class ComputingServiceTest {
     private val customer = Customer(name = "Customer1", maps = listOf(map))
 
     @Test
-    fun `should insert element to Buffer`() {
-        /* When */
-        computingService.insertToBuffer(inputDataPoint1)
-
-        /* Then */
-        val bufferState = computingService.readFromBuffer()
-        assertThat(bufferState["DeviceId1"]!!.size, `is`(1))
-        assertThat(bufferState["DeviceId1"]!!.first().dataPoints.size, `is`(1))
-
-        bufferState.clear()
-    }
-
-    @Test
-    fun `should group elements where the timestamps are close together`() {
-        /* When */
-        computingService.insertToBuffer(inputDataPoint1)
-        computingService.insertToBuffer(inputDataPoint2)
-        computingService.insertToBuffer(inputDataPoint3)
-
-        /* Then */
-        val bufferState = computingService.readFromBuffer()
-        assertThat(bufferState["DeviceId1"]!!.size, `is`(1))
-        assertThat(bufferState["DeviceId1"]!!.first().dataPoints.size, `is`(3))
-
-        bufferState.clear()
-    }
-
-    @Test
     fun `should find elements to compute`() {
         /* Given */
-        val datapointGroup = DatapointGroup(timeStamp, inputDataPoint1.deviceId)
-        datapointGroup.dataPoints.addAll(listOf(inputDataPoint1 ,inputDataPoint2 ,inputDataPoint3))
+        val datapointGroup = DatapointGroup(inputDataPoint1)
+        datapointGroup.dataPoints.addAll(listOf(inputDataPoint2 ,inputDataPoint3))
 
         val datapointGroupList = ConcurrentSet<DatapointGroup>()
         datapointGroupList.add(datapointGroup)
@@ -100,51 +61,24 @@ class ComputingServiceTest {
     @Test
     fun `should compute new TrackingPoint`() {
         /* Given */
-        val datapointGroup = DatapointGroup(timeStamp, "Device1")
-        datapointGroup.dataPoints.addAll(listOf(inputDataPoint1 ,inputDataPoint2 ,inputDataPoint3))
-        val highestRSSI = datapointGroup.dataPoints.minBy { it -> it.signalStrength }
+        val datapointGroup = DatapointGroup(inputDataPoint1)
+        datapointGroup.dataPoints.addAll(listOf(inputDataPoint2 ,inputDataPoint3))
+        val highestRSSI = datapointGroup.dataPoints.maxBy { it -> it.signalStrength }
         val correctLocation = routerList.first { it -> it.id == highestRSSI!!.routerId }
 
         given(datastoreWs.getCustomerByRouterId(routerList.map { it.id!! }[0])).willReturn(customer)
 
         /* When */
-        val computedTrackingPoint = computingService.computeFromRSSIPublic(datapointGroup)
+        val computedTrackingPoint = computingService.computeFromRSSI(datapointGroup)
 
         /* Then */
         with(computedTrackingPoint!!.first){
             assertThat(this.deviceId, `is`(datapointGroup.deviceId))
-            assertThat(this.routerDataPoints!!.size, `is`(3))
+            assertThat(this.routerDataPoints.size, `is`(3))
             assertThat(this.location!!.x, `is`(correctLocation.location!!.x))
             assertThat(this.location!!.y, `is`(correctLocation.location!!.y))
+            assertThat(this.timestamp!!, `is`(highestRSSI!!.timestamp.toInstant(ZoneOffset.UTC).toString()))
         }
-        assertThat(computedTrackingPoint!!.second, `is`(map.id))
-    }
-
-    @Test
-    fun `should parse Routers into Hashmap`() {
-        /* When */
-        val hashMapResult = computingService.parseCustomerRoutersIntoHashmapPublic(customer)
-
-        /* Then */
-        assertThat(hashMapResult[router1.id], `is`(router1))
-        assertThat(hashMapResult[router2.id], `is`(router2))
-        assertThat(hashMapResult[router3.id], `is`(router3))
-    }
-
-    @Test
-    fun `should add Router from HashMap to RouterDataPoints`() {
-        /* Given */
-        val incompleteRouter1 = Router(router1.id)
-
-        val routerDataPoint1 = RouterDataPoint(router = incompleteRouter1, timestamp = timeStamp.toString())
-        val routerDataPointList = listOf(routerDataPoint1)
-
-        val routerHashMap = hashMapOf(router1.id!! to router1)
-
-        /* When */
-        computingService.addRouterToRouterDataPointsPublic(routerDataPointList, routerHashMap)
-
-        /* Then */
-        assertThat(routerDataPointList[0].router, `is`(router1))
+        assertThat(computedTrackingPoint.second, `is`(map.id))
     }
 }

@@ -18,21 +18,16 @@ class Buffer {
                 datapointGroup.dataPoints.add(inputDataPoint)
             } else {
                 val newDatapointGroup = DatapointGroup(
-                        inputDataPoint.timestamp,
-                        inputDataPoint.deviceId
-                ).apply {
-                    dataPoints.add(inputDataPoint)
-                }
+                    inputDataPoint
+                )
 
                 data[inputDataPoint.deviceId]!!.add(newDatapointGroup)
             }
         } else {
             val newDatapointGroup = DatapointGroup(
-                    inputDataPoint.timestamp,
-                    inputDataPoint.deviceId
-            ).apply {
-                dataPoints.add(inputDataPoint)
-            }
+                inputDataPoint
+            )
+
             val datapointGroups = ConcurrentSet<DatapointGroup>()
             datapointGroups.add(newDatapointGroup)
             data[inputDataPoint.deviceId] = datapointGroups

@@ -11,8 +11,6 @@ import kotlinx.coroutines.experimental.launch
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.concurrent.ConcurrentHashMap
-import javax.sound.midi.Track
 
 var buffer = Buffer()
 
@@ -106,32 +104,16 @@ class ComputingService (
         )
 
         val customerObj = datastoreWs.getCustomerByRouterId(routersToLookUp[0])
-        val routerHashMap2 = newTrackingPoint.parseCustomerRoutersIntoHashmap(customerObj!!)
+        val routerWithCoordinatesHashMap = customerObj!!.toRoutersHashmap()
 
-        newTrackingPoint.fillMissingRouterCoordinates(routerHashMap2)
+        strongestRSSI.router = routerWithCoordinatesHashMap[strongestRSSI.router!!.id]
+
+        newTrackingPoint.fillMissingRouterCoordinates(routerWithCoordinatesHashMap)
         newTrackingPoint.setLocationFromRouterDataPoint(strongestRSSI)
 
         return Pair(
             newTrackingPoint,
             customerObj.maps!![0].id!!
         )
-    }
-
-    fun parseCustomerRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
-        val hashMap = HashMap<String, Router>()
-
-        for (map in customer.maps!!) {
-            for (router in map.router!!) {
-                hashMap[router.id!!] = router
-            }
-        }
-
-        return hashMap
-    }
-
-    fun addRouterToRouterDataPoints(routerDataPointList: List<RouterDataPoint>, routerHashMap: HashMap<String, Router>) {
-        for (routerDataPoint in routerDataPointList) {
-            routerDataPoint.router = routerHashMap[routerDataPoint.router!!.id]
-        }
     }
 }

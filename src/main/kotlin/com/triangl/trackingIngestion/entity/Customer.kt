@@ -29,4 +29,16 @@ class Customer (
         this.createdAt = Instant.now().toString()
         this.lastUpdatedAt = Instant.now().toString()
     }
+
+    fun toRoutersHashmap(): HashMap<String, Router> {
+        val hashMap = HashMap<String, Router>()
+
+        for (map in maps!!) {
+            for (router in map.router!!) {
+                hashMap[router.id!!] = router
+            }
+        }
+
+        return hashMap
+    }
 }

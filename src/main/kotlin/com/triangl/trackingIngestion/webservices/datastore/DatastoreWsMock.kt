@@ -33,7 +33,7 @@ class DatastoreWsMock: DatastoreWs {
     }
 
     override fun getCustomerByRouterId(routerId: String): Customer? {
-        val map = Map(name = "Map1", svgPath = "/dir", size =  Coordinate(x = 10f, y = 10f), router = arrayListOf(router1, router2, router3))
+        val map = Map(id = "ID1", name = "Map1", svgPath = "/dir", size =  Coordinate(x = 10f, y = 10f), router = arrayListOf(router1, router2, router3))
 
         return Customer("Customer").apply { maps = listOf(map) }
     }

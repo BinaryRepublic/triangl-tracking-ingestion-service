@@ -35,18 +35,6 @@ class TrackingPoint (
         this.createdAt ?: Instant.now().toString()
     }
 
-    fun parseCustomerRoutersIntoHashmap(customer: Customer): HashMap<String, Router> {
-        val hashMap = HashMap<String, Router>()
-
-        for (map in customer.maps!!) {
-            for (router in map.router!!) {
-                hashMap[router.id!!] = router
-            }
-        }
-
-        return hashMap
-    }
-
     fun fillMissingRouterCoordinates(routerHashMap: HashMap<String, Router>) {
         for (routerDataPoint in routerDataPoints) {
             routerDataPoint.router = routerHashMap[routerDataPoint.router!!.id]
@@ -58,5 +46,6 @@ class TrackingPoint (
             x = strongestRouterDataPoint.router!!.location!!.x,
             y = strongestRouterDataPoint.router!!.location!!.y
         )
+        timestamp = strongestRouterDataPoint.timestamp
     }
 }
