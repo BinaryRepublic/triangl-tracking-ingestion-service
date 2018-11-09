@@ -1,17 +1,17 @@
 package com.triangl.trackingIngestion.entity
 
 import java.time.LocalDateTime
-import java.util.*
 
 class DatapointGroup (
-        initialInstant: LocalDateTime,
-        var deviceId: String
+    firstInputDataPoint: InputDataPoint
 ) {
-    var startInstant: LocalDateTime = initialInstant.minusSeconds(3)
+    var startInstant: LocalDateTime = firstInputDataPoint.timestamp.minusSeconds(3)
 
-    var endInstant: LocalDateTime = initialInstant.plusSeconds(3)
+    var endInstant: LocalDateTime = firstInputDataPoint.timestamp.plusSeconds(3)
 
-    var dataPoints = ArrayList<InputDataPoint>()
+    var deviceId = firstInputDataPoint.deviceId
 
-    var timeoutInstant: LocalDateTime = initialInstant.plusSeconds(30)
+    var dataPoints = arrayListOf(firstInputDataPoint)
+
+    var timeoutInstant: LocalDateTime = firstInputDataPoint.timestamp.plusSeconds(30)
 }

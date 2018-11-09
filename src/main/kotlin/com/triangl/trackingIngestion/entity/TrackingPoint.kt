@@ -12,7 +12,7 @@ class TrackingPoint (
     var id: String? = null,
 
     @Index
-    var routerDataPoints: List<RouterDataPoint>? = null,
+    var routerDataPoints: List<RouterDataPoint>,
 
     @Index
     var deviceId: String? = null,
@@ -33,5 +33,19 @@ class TrackingPoint (
         this.id ?: UUID.randomUUID().toString()
         this.lastUpdatedAt ?: Instant.now().toString()
         this.createdAt ?: Instant.now().toString()
+    }
+
+    fun fillMissingRouterCoordinates(routerHashMap: HashMap<String, Router>) {
+        for (routerDataPoint in routerDataPoints) {
+            routerDataPoint.router!!.location = routerHashMap[routerDataPoint.router!!.id]!!.location
+        }
+    }
+
+    fun setLocationAndTimestampFromRouterDataPoint(routerDataPoint: RouterDataPoint) {
+        location = Coordinate(
+            x = routerDataPoint.router!!.location!!.x,
+            y = routerDataPoint.router!!.location!!.y
+        )
+        timestamp = routerDataPoint.timestamp
     }
 }
