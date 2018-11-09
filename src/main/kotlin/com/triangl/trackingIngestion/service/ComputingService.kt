@@ -40,7 +40,6 @@ class ComputingService (
             }
         }.invokeOnCompletion {
             startBufferWatcher()
-
         }
     }
 
@@ -110,7 +109,7 @@ class ComputingService (
         strongestRSSI.router = routerWithCoordinatesHashMap[strongestRSSI.router!!.id]
 
         newTrackingPoint.fillMissingRouterCoordinates(routerWithCoordinatesHashMap)
-        newTrackingPoint.setLocationFromRouterDataPoint(strongestRSSI)
+        newTrackingPoint.setLocationAndTimestampFromRouterDataPoint(strongestRSSI)
 
         return Pair(
             newTrackingPoint,

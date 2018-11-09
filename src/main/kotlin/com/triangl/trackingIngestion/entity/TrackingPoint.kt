@@ -37,15 +37,15 @@ class TrackingPoint (
 
     fun fillMissingRouterCoordinates(routerHashMap: HashMap<String, Router>) {
         for (routerDataPoint in routerDataPoints) {
-            routerDataPoint.router = routerHashMap[routerDataPoint.router!!.id]
+            routerDataPoint.router!!.location = routerHashMap[routerDataPoint.router!!.id]!!.location
         }
     }
 
-    fun setLocationFromRouterDataPoint(strongestRouterDataPoint: RouterDataPoint) {
+    fun setLocationAndTimestampFromRouterDataPoint(routerDataPoint: RouterDataPoint) {
         location = Coordinate(
-            x = strongestRouterDataPoint.router!!.location!!.x,
-            y = strongestRouterDataPoint.router!!.location!!.y
+            x = routerDataPoint.router!!.location!!.x,
+            y = routerDataPoint.router!!.location!!.y
         )
-        timestamp = strongestRouterDataPoint.timestamp
+        timestamp = routerDataPoint.timestamp
     }
 }
