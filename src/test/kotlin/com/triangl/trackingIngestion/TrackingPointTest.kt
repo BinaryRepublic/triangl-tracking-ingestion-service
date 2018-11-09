@@ -49,8 +49,8 @@ class TrackingPointTest {
         newTrackingPoint.fillMissingRouterCoordinates(routerWithCoordinatesHashMap)
 
         /* Then */
-        MatcherAssert.assertThat(newTrackingPoint.routerDataPoints[0].router, Matchers.`is`(router1))
-        MatcherAssert.assertThat(newTrackingPoint.routerDataPoints[1].router, Matchers.`is`(router2))
-        MatcherAssert.assertThat(newTrackingPoint.routerDataPoints[2].router, Matchers.`is`(router3))
+        MatcherAssert.assertThat(newTrackingPoint.routerDataPoints[0].router!!.location, Matchers.`is`(router1.location))
+        MatcherAssert.assertThat(newTrackingPoint.routerDataPoints[1].router!!.location, Matchers.`is`(router2.location))
+        MatcherAssert.assertThat(newTrackingPoint.routerDataPoints[2].router!!.location, Matchers.`is`(router3.location))
     }
 }
