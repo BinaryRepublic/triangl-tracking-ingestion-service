@@ -63,8 +63,7 @@ class ComputingServiceTest {
         /* Given */
         val datapointGroup = DatapointGroup(inputDataPoint1)
         datapointGroup.dataPoints.addAll(listOf(inputDataPoint2 ,inputDataPoint3))
-        val highestRSSI = datapointGroup.dataPoints.maxBy { it -> it.signalStrength }
-        val correctLocation = routerList.first { it -> it.id == highestRSSI!!.routerId }
+        val correctLocation = routerList.first { it -> it.id == inputDataPoint3.routerId }
 
         given(datastoreWs.getCustomerByRouterId(routerList.map { it.id!! }[0])).willReturn(customer)
 
@@ -77,7 +76,7 @@ class ComputingServiceTest {
             assertThat(this.routerDataPoints.size, `is`(3))
             assertThat(this.location!!.x, `is`(correctLocation.location!!.x))
             assertThat(this.location!!.y, `is`(correctLocation.location!!.y))
-            assertThat(this.timestamp!!, `is`(highestRSSI!!.timestamp.toInstant(ZoneOffset.UTC).toString()))
+            assertThat(this.timestamp!!, `is`(inputDataPoint3.timestamp.toInstant(ZoneOffset.UTC).toString()))
         }
         assertThat(computedTrackingPoint.second, `is`(map.id))
     }
