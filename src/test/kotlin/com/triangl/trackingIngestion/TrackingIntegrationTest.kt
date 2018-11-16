@@ -35,12 +35,12 @@ class TrackingIntegrationTest {
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestampString\": \"$now\" }")
-                .post("/tracking")
-                .then()
-                .log().ifValidationFails()
-                .statusCode(HttpStatus.NO_CONTENT.value())
+            .contentType(ContentType.JSON)
+            .body("{ \"deviceId\": \"$deviceId\", \"routerId\": \"$routerId\", \"signalStrength\": \"$signalStrength\", \"timestampString\": \"$now\" }")
+            .post("/tracking")
+            .then()
+            .log().ifValidationFails()
+            .statusCode(HttpStatus.NO_CONTENT.value())
 
     }
 
