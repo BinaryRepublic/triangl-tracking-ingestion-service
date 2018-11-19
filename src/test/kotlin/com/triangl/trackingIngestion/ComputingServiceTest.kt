@@ -28,9 +28,9 @@ class ComputingServiceTest {
     private lateinit var computingService: ComputingService
 
     private val timeStampString = "2018-09-25 13:49:09"
-    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", "associatedAP",timeStampString, -255)
-    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", "associatedAP",timeStampString, -200)
-    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", "associatedAP",timeStampString, -180)
+    private val inputDataPoint1 = InputDataPoint("RouterId1", "DeviceId1", "associatedAP",timeStampString, -55)
+    private val inputDataPoint2 = InputDataPoint("RouterId2", "DeviceId1", "associatedAP",timeStampString, -20)
+    private val inputDataPoint3 = InputDataPoint("RouterId3", "DeviceId1", "associatedAP",timeStampString, -18)
 
     private val router1 = Router("RouterId1", Coordinate(x = 1f, y = 2f))
     private val router2 = Router("RouterId2", Coordinate(x = 2f, y = 3f))

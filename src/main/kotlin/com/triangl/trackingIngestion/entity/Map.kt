@@ -1,8 +1,5 @@
 package com.triangl.trackingIngestion.entity
 
-import javax.persistence.Entity
-
-@Entity
 class Map (
     var id: String? = null,
 
@@ -12,5 +9,11 @@ class Map (
 
     var size: Coordinate? = null,
 
-    var router: ArrayList<Router>? = null
+    var areas: List<Area>? = null,
+
+    var router: ArrayList<Router>? = null,
+
+    var lastUpdatedAt: String? = null,
+
+    var createdAt: String? = null
 )
