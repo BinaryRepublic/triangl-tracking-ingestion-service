@@ -6,7 +6,6 @@ import com.googlecode.objectify.annotation.Index
 import java.time.Instant
 import java.util.*
 
-@javax.persistence.Entity
 @Entity
 class Customer (
     @Id

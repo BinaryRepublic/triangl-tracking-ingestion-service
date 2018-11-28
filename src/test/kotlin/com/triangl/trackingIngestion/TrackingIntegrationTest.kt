@@ -31,7 +31,7 @@ class TrackingIntegrationTest {
 
         val routerId = "Router1"
         val deviceId = "Device1"
-        val signalStrength = -255
+        val signalStrength = -80
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         RestAssured.given()
@@ -49,7 +49,7 @@ class TrackingIntegrationTest {
 
         val routerId = "Router1"
         val deviceId = "Device1"
-        val signalStrength = -255
+        val signalStrength = -80
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         RestAssured.given()

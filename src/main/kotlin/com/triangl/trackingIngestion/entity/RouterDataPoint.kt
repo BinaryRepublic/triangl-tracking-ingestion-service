@@ -1,9 +1,7 @@
 package com.triangl.trackingIngestion.entity
 
 import java.util.*
-import javax.persistence.Entity
 
-@Entity
 class RouterDataPoint (
     var id: String? = null,
 
