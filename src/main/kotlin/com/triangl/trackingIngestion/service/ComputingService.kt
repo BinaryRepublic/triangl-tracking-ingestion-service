@@ -55,8 +55,10 @@ class ComputingService (
 
             trackingPoints = trackingPoints.filterNotNull()
 
-            trackingPoints.map {(newTrackingPoint, mapId) ->
-                ingestionService.insertTrackingPoint(newTrackingPoint, mapId)
+            ObjectifyService.run {
+                trackingPoints.map { (newTrackingPoint, mapId) ->
+                    ingestionService.insertTrackingPoint(newTrackingPoint, mapId)
+                }
             }
         }
     }
