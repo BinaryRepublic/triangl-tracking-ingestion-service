@@ -72,22 +72,24 @@ class ComputingService (
 
     fun findElementsToCompute(datapointGroups: ConcurrentSet<DatapointGroup>, deviceId: String):ArrayList<DatapointGroup> {
         val now = LocalDateTime.now()
+        val valuesToCompute = arrayListOf<DatapointGroup>()
         val valuesToRemove = arrayListOf<DatapointGroup>()
 
         datapointGroups.forEach {datapointGroup ->
             if (datapointGroup.timeoutInstant < now && datapointGroup.dataPoints.size == 2 || datapointGroup.dataPoints.size >= 3) {       //for the computing based on RSSI is 1 inputDataPoint enough
-                valuesToRemove.add(datapointGroup)
+                valuesToCompute.add(datapointGroup)
             } else if (datapointGroup.timeoutInstant < now) {
                 valuesToRemove.add(datapointGroup)
             }
         }
 
+        datapointGroups.removeAll(valuesToCompute)
         datapointGroups.removeAll(valuesToRemove)
 
         if (datapointGroups.size == 0) {
             buffer.data.remove(deviceId)
         }
-        return valuesToRemove
+        return valuesToCompute
     }
 
     fun computeFromRSSI (datapointGroup: DatapointGroup):Pair<TrackingPoint,String>? {
