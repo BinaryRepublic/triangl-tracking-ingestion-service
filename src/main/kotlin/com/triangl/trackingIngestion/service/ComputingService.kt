@@ -135,7 +135,7 @@ class ComputingService (
         }.toTypedArray()
 
         val distances = newTrackingPoint.routerDataPoints.map {
-            convertRSSItoMeter(it.signalStrength!!)
+            convertRSSItoCentimeter(it.signalStrength!!)
         }.toDoubleArray()
 
         // Calculation from  https://github.com/lemmingapex/trilateration
@@ -148,10 +148,12 @@ class ComputingService (
         if (newTrackingPoint.deviceId == "D4:A3:3D:4A:75:61") {
             val now = Instant.now()
             val allrouters = newTrackingPoint.routerDataPoints.map { it.router!!.id }
+            val allRSSI = newTrackingPoint.routerDataPoints.map { it.signalStrength }
             println("-------$now-------")
             println("Routers: ${objMapper.writeValueAsString(allrouters)}")
             println("Router Positions: ${objMapper.writeValueAsString(positions)}")
-            println("Distances to Routers: ${objMapper.writeValueAsString(distances)}")
+            println("Distances to Routers in RSSI: ${objMapper.writeValueAsString(allRSSI)}")
+            println("Distances to Routers in Centimeter: ${objMapper.writeValueAsString(distances)}")
             println("X: ${centroid[0]}")
             println("Y: ${centroid[1]}")
             println("------------------------------------")
@@ -163,10 +165,10 @@ class ComputingService (
 
     }
 
-    fun convertRSSItoMeter(rssi: Int): Double {
+    fun convertRSSItoCentimeter(rssi: Int): Double {
         // https://electronics.stackexchange.com/a/83356
         val a = (-15).toDouble()  // is the received signal strength in dBm at 1 metre
         val n = 5.toDouble()      // is the propagation constant or path-loss exponent
-        return 1 / Math.pow(10.toDouble(), ((rssi - a)/ (10*n)))
+        return (1 / Math.pow(10.toDouble(), ((rssi - a)/ (10*n)))) * 100
     }
 }
