@@ -30,9 +30,9 @@ class TrackingPoint (
     var createdAt: String? = null
 ) {
     init {
-        this.id ?: UUID.randomUUID().toString()
-        this.lastUpdatedAt ?: Instant.now().toString()
-        this.createdAt ?: Instant.now().toString()
+        this.id = this.id ?: UUID.randomUUID().toString()
+        this.lastUpdatedAt = this.lastUpdatedAt ?: Instant.now().toString()
+        this.createdAt = this.createdAt ?: Instant.now().toString()
     }
 
     fun fillMissingRouterCoordinates(routerHashMap: HashMap<String, Router>) {
