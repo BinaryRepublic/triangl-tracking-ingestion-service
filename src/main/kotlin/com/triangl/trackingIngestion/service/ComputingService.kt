@@ -1,6 +1,10 @@
 package com.triangl.trackingIngestion.service
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.googlecode.objectify.ObjectifyService
+import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver
+import com.lemmingapex.trilateration.TrilaterationFunction
 import com.triangl.trackingIngestion.`class`.Buffer
 import com.triangl.trackingIngestion.dto.RouterLastSeenDto
 import com.triangl.trackingIngestion.entity.*
@@ -8,9 +12,12 @@ import com.triangl.trackingIngestion.webservices.datastore.DatastoreWs
 import io.grpc.netty.shaded.io.netty.util.internal.ConcurrentSet
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
+import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+
 
 var buffer = Buffer()
 
@@ -97,7 +104,6 @@ class ComputingService (
             )
         }
 
-        val strongestRSSI = routerDataPointList.maxBy { it.signalStrength!! }!!
         val routersToLookUp = datapointGroup.dataPoints.map { it.routerId }
 
         val newTrackingPoint = TrackingPoint(
@@ -108,14 +114,61 @@ class ComputingService (
         val customerObj = datastoreWs.getCustomerByRouterId(routersToLookUp[0])
         val routerWithCoordinatesHashMap = customerObj!!.toRoutersHashmap()
 
-        strongestRSSI.router = routerWithCoordinatesHashMap[strongestRSSI.router!!.id]
-
         newTrackingPoint.fillMissingRouterCoordinates(routerWithCoordinatesHashMap)
+
+        val strongestRSSI = newTrackingPoint.routerDataPoints.maxBy { it.signalStrength!! }!!
+        val location = computeLocationFromLaterating(newTrackingPoint)
+
         newTrackingPoint.setLocationAndTimestampFromRouterDataPoint(strongestRSSI)
 
         return Pair(
             newTrackingPoint,
             customerObj.maps!![0].id!!
         )
+    }
+
+    fun computeLocationFromLaterating(newTrackingPoint: TrackingPoint) {
+        val objMapper = jacksonObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+
+        val positions = newTrackingPoint.routerDataPoints.map {
+            doubleArrayOf(it.router!!.location!!.x!!.toDouble(), it.router!!.location!!.y!!.toDouble())
+        }.toTypedArray()
+
+        val distances = newTrackingPoint.routerDataPoints.map {
+            convertRSSItoCentimeter(it.signalStrength!!)
+        }.toDoubleArray()
+
+        // Calculation from  https://github.com/lemmingapex/trilateration
+        val solver = NonLinearLeastSquaresSolver(TrilaterationFunction(positions, distances), LevenbergMarquardtOptimizer())
+        val optimum = solver.solve()
+
+        // the answer
+        val centroid = optimum.point.toArray()
+
+        if (newTrackingPoint.deviceId == "D4:A3:3D:4A:75:61") {
+            val now = Instant.now()
+            val allrouters = newTrackingPoint.routerDataPoints.map { it.router!!.id }
+            val allRSSI = newTrackingPoint.routerDataPoints.map { it.signalStrength }
+            println("-------$now-------")
+            println("Routers: ${objMapper.writeValueAsString(allrouters)}")
+            println("Router Positions: ${objMapper.writeValueAsString(positions)}")
+            println("Distances to Routers in RSSI: ${objMapper.writeValueAsString(allRSSI)}")
+            println("Distances to Routers in Centimeter: ${objMapper.writeValueAsString(distances)}")
+            println("X: ${centroid[0]}")
+            println("Y: ${centroid[1]}")
+            println("------------------------------------")
+
+        }
+        // error and geometry information; may throw SingularMatrixException depending the threshold argument provided
+        // val standardDeviation = optimum.getSigma(0.0)
+        // val covarianceMatrix = optimum.getCovariances(0.0)
+
+    }
+
+    fun convertRSSItoCentimeter(rssi: Int): Double {
+        // https://electronics.stackexchange.com/a/83356
+        val a = (-15).toDouble()  // is the received signal strength in dBm at 1 metre
+        val n = 5.toDouble()      // is the propagation constant or path-loss exponent
+        return (1 / Math.pow(10.toDouble(), ((rssi - a)/ (10*n)))) * 100
     }
 }
