@@ -23,9 +23,9 @@ class DatastoreWsMock: DatastoreWs {
     override fun saveTrackingPoint(trackingPoint: TrackingPoint): Key<TrackingPoint> = Key.create(TrackingPoint::class.java, trackingPoint.id!!)
 
     override fun getTrackingPointByKey(key: Key<TrackingPoint>): TrackingPoint {
-        val routerDataPoint1 = RouterDataPoint(router = router1, signalStrength = 100, timestamp = now)
-        val routerDataPoint2 = RouterDataPoint(router = router1, signalStrength = 100, timestamp = now)
-        val routerDataPoint3 = RouterDataPoint(router = router1, signalStrength = 100, timestamp = now)
+        val routerDataPoint1 = RouterDataPoint(router = router1, signalStrength = -50, timestamp = now)
+        val routerDataPoint2 = RouterDataPoint(router = router1, signalStrength = -50, timestamp = now)
+        val routerDataPoint3 = RouterDataPoint(router = router1, signalStrength = -50, timestamp = now)
         val routerDataList = arrayListOf(routerDataPoint1, routerDataPoint2, routerDataPoint3)
 
         return TrackingPoint(routerDataPoints = routerDataList, deviceId = "Device1", location = Coordinate(x = 3f, y = 5f))
