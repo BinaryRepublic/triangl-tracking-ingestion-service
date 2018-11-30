@@ -76,7 +76,11 @@ class ComputingService (
         val valuesToRemove = arrayListOf<DatapointGroup>()
 
         datapointGroups.forEach {datapointGroup ->
-            if (datapointGroup.timeoutInstant < now && datapointGroup.dataPoints.size == 2 || datapointGroup.dataPoints.size >= 3) {       //for the computing based on RSSI is 1 inputDataPoint enough
+            val numberOfUniqueRoutersInDataPoints = datapointGroup.dataPoints.map { it.routerId }.toSet().size
+            if (
+                (datapointGroup.timeoutInstant < now && numberOfUniqueRoutersInDataPoints == 2) ||
+                numberOfUniqueRoutersInDataPoints >= 3
+            ) {
                 valuesToCompute.add(datapointGroup)
             } else if (datapointGroup.timeoutInstant < now) {
                 valuesToRemove.add(datapointGroup)
