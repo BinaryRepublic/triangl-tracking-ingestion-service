@@ -13,6 +13,7 @@ import io.grpc.netty.shaded.io.netty.util.internal.ConcurrentSet
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDateTime
@@ -26,6 +27,12 @@ class ComputingService (
     var ingestionService: IngestionService,
     var datastoreWs: DatastoreWs
 ) {
+    @Value("\${mac.salt}")
+    lateinit var salt: String
+
+    @Value("\${mac.pepper}")
+    lateinit var pepper: String
+
     fun insertToBuffer(inputDataPoint: InputDataPoint) =
         buffer.insert(inputDataPoint)
 
@@ -62,8 +69,12 @@ class ComputingService (
 
             trackingPoints = trackingPoints.filterNotNull()
 
+            trackingPoints.forEach { (newTrackingPoint, _) ->
+                newTrackingPoint.hashMacAddress(salt, pepper)
+            }
+
             ObjectifyService.run {
-                trackingPoints.map { (newTrackingPoint, mapId) ->
+                trackingPoints.forEach { (newTrackingPoint, mapId) ->
                     ingestionService.insertTrackingPoint(newTrackingPoint, mapId)
                 }
             }

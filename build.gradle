@@ -67,7 +67,8 @@ dependencies {
 	compile("io.sentry:sentry-spring:1.7.10")
 	compile("io.sentry:sentry-logback:1.7.13")
     compile("com.lemmingapex.trilateration:trilateration:1.0.2")
-
+    compile("org.springframework.security:spring-security-core")
+    
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("io.rest-assured:rest-assured:3.0.2")
     testCompile("com.nhaarman:mockito-kotlin:1.6.0")

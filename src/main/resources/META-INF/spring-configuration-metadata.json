@@ -3,6 +3,14 @@
     {
       "name": "pubsub.topicId",
       "type": "java.lang.String"
+    },
+    {
+      "name": "mac.salt",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "mac.pepper",
+      "type": "java.lang.String"
     }
   ]
 }
