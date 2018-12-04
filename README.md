@@ -31,6 +31,7 @@ This Service is an Endpoint for the Routers to send their DataPoints to. These D
 ```
 The service then:
 - calculates the location of the TrackedDevice,
+- hashes the Mac Address
 - inserts it into the Google Datastore 
 - notifies the [Pipeline](https://github.com/codeuniversity/triangl-processing-pipeline) over Google Pub/Sub about the new Tracking Point in the Datastore. 
 
@@ -42,7 +43,7 @@ The location calculation function works in the following way:
 It starts in a second [kotlin coroutine](https://kotlinlang.org/docs/reference/coroutines-overview.html) and then checks
 every 5 seconds if there are some locations to compute.
 
-The computation currently works based on the RSSI (Received Signal Strength Indication). The location of the TrackedDevice is currently the location of the nearest router that tracked him.
+The computation currently works based on the RSSI (Received Signal Strength Indication). The location of the TrackedDevice is currently the location of the nearest router that tracked him. Lateration is currently still work in Progress.
 
 ## Tools used
 - Objectify
@@ -52,7 +53,13 @@ The computation currently works based on the RSSI (Received Signal Strength Indi
 ## Environment Variables
 The following Environment variables are need for this service:
 
-```GOOGLE_APPLICATION_CREDENTIALS:{pathToGoogleKeyFile.json}```
+```
+GOOGLE_APPLICATION_CREDENTIALS:{pathToGoogleKeyFile.json}
+mac.salt:{your-salt-for-hashing}
+mac.pepper:{your-pepper-for-hashing}
+```
+
+Be aware that salt and pepper can't change once some DatabaseEntries are created with it.
 
 Moreover, you can set the ```pubsub.topicId``` env variable via the console
 to override the standard value ```pubsub.topicId=test```.
@@ -60,4 +67,4 @@ to override the standard value ```pubsub.topicId=test```.
 ## Run
 - With Gradle
 
-  ```GOOGLE_APPLICATION_CREDENTIALS=/path/to/google/key/file.json ./gradlew bootRun```
+  ```GOOGLE_APPLICATION_CREDENTIALS=/path/to/google/key/file.json mac.salt:{your-salt-for-hashing} mac.pepper:{your-pepper-for-hashing} ./gradlew bootRun```
