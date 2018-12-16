@@ -1,7 +1,5 @@
 package com.triangl.trackingIngestion.service
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.googlecode.objectify.ObjectifyService
 import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver
 import com.lemmingapex.trilateration.TrilaterationFunction
@@ -14,14 +12,13 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 
 var buffer = Buffer()
-
 @Service("computingService")
 class ComputingService (
     var ingestionService: IngestionService,
@@ -33,8 +30,18 @@ class ComputingService (
     @Value("\${mac.pepper}")
     lateinit var pepper: String
 
-    fun insertToBuffer(inputDataPoint: InputDataPoint) =
+    fun insertToBuffer(inputDataPoint: InputDataPoint) {
+        val now = LocalDateTime.now()
+
+        val notBeingHashed = inputDataPoint.deviceId.substring(0,8)     // this is the manufacturer identifier
+        val beingHashed = inputDataPoint.deviceId.substring(8)
+
+        val hash = notBeingHashed + BCrypt.hashpw(beingHashed + pepper, salt)
+
+        println("$hash  ${inputDataPoint.signalStrength}    ${inputDataPoint.routerId}      ${inputDataPoint.timestamp}     $now")
+
         buffer.insert(inputDataPoint)
+    }
 
     fun readFromBuffer(): MutableMap<String, ConcurrentSet<DatapointGroup>> =
         buffer.read()
@@ -145,8 +152,6 @@ class ComputingService (
     }
 
     fun computeLocationFromLaterating(newTrackingPoint: TrackingPoint) {
-        val objMapper = jacksonObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-
         val positions = newTrackingPoint.routerDataPoints.map {
             doubleArrayOf(it.router!!.location!!.x!!.toDouble(), it.router!!.location!!.y!!.toDouble())
         }.toTypedArray()
@@ -162,20 +167,6 @@ class ComputingService (
         // the answer
         val centroid = optimum.point.toArray()
 
-        if (newTrackingPoint.deviceId == "D4:A3:3D:4A:75:61") {
-            val now = Instant.now()
-            val allrouters = newTrackingPoint.routerDataPoints.map { it.router!!.id }
-            val allRSSI = newTrackingPoint.routerDataPoints.map { it.signalStrength }
-            println("-------$now-------")
-            println("Routers: ${objMapper.writeValueAsString(allrouters)}")
-            println("Router Positions: ${objMapper.writeValueAsString(positions)}")
-            println("Distances to Routers in RSSI: ${objMapper.writeValueAsString(allRSSI)}")
-            println("Distances to Routers in Centimeter: ${objMapper.writeValueAsString(distances)}")
-            println("X: ${centroid[0]}")
-            println("Y: ${centroid[1]}")
-            println("------------------------------------")
-
-        }
         // error and geometry information; may throw SingularMatrixException depending the threshold argument provided
         // val standardDeviation = optimum.getSigma(0.0)
         // val covarianceMatrix = optimum.getCovariances(0.0)
