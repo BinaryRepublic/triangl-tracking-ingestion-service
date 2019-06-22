@@ -7,6 +7,8 @@ import com.triangl.trackingIngestion.entity.TrackingPoint
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Profile
+import org.springframework.context.annotation.PropertySource
+import org.springframework.context.annotation.PropertySources
 import org.springframework.stereotype.Component
 
 
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component
 class ObjectifyWebFilter : ObjectifyFilter()
 
 @SpringBootApplication
+@PropertySources(PropertySource("classpath:application.properties"), PropertySource("classpath:auth0.properties"))
 class TrackingIngestionApplication
 
 fun main(args: Array<String>) {
