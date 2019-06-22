@@ -30,8 +30,8 @@ class TrackingIntegrationTest {
     fun `should accept an InputDataPoint`() {
 
         val routerId = "Router1"
-        val deviceId = "Device1"
-        val signalStrength = -255
+        val deviceId = "00:00:00:00:00:00"
+        val signalStrength = -80
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         RestAssured.given()
@@ -48,8 +48,8 @@ class TrackingIntegrationTest {
     fun `should accept a list of InputDataPoints`() {
 
         val routerId = "Router1"
-        val deviceId = "Device1"
-        val signalStrength = -255
+        val deviceId = "00:00:00:00:00:00"
+        val signalStrength = -80
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         RestAssured.given()

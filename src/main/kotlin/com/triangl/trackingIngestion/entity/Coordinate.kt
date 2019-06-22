@@ -2,9 +2,7 @@ package com.triangl.trackingIngestion.entity
 
 import java.time.Instant
 import java.util.*
-import javax.persistence.Entity
 
-@Entity
 class Coordinate (
     var id: String? = null,
 

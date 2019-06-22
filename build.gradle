@@ -50,9 +50,9 @@ repositories {
     jcenter()
 }
 
-
 dependencies { 
-    implementation("com.googlecode.objectify:objectify:6.0.2")
+  implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("com.googlecode.objectify:objectify:6.0.2")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -66,6 +66,8 @@ dependencies {
 	implementation("io.sentry:sentry-spring:1.7.10")
 	implementation("io.sentry:sentry-logback:1.7.13")
 	implementation("com.auth0:auth0-spring-security-api:1.1.0")
+  implementation("com.lemmingapex.trilateration:trilateration:1.0.2")
+  implementation("org.springframework.security:spring-security-core")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.rest-assured:rest-assured:3.0.2")
